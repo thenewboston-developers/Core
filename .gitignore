@@ -1,0 +1,71 @@
+# Django
+*.log
+*.pot
+*.pyc
+__pycache__
+db.sqlite3
+media
+
+# Backup files
+*.bak
+
+# Python
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+*.egg
+*.egg-info/
+*.manifest
+*.spec
+.Python build/
+.eggs/
+.installed.cfg
+develop-eggs/
+dist/
+downloads/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+
+# Installer logs
+pip-delete-this-directory.txt
+pip-log.txt
+
+# Unit test / coverage reports
+*.cover
+.cache
+.coverage
+.coverage.*
+.hypothesis/
+.pytest_cache/
+.tox/
+coverage.xml
+htmlcov/
+nosetests.xml
+
+# pyenv
+.python-version
+
+# pytest
+.pytest_cache
+
+# Environments
+/local
+/.env
+.venv
+ENV/
+env.bak/
+env/
+venv
+venv.bak/
+venv/
+
+# IDEs
+.DS_Store
+.idea
+.vscode
