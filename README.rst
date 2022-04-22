@@ -39,15 +39,4 @@ Response::
 ws://127.0.0.1:8000/ws/blocks/{ACCOUNT_NUMBER}
 +++++++++++++
 
-Send::
-
-    {
-      "message": "Hey"
-    }
-
-Receive::
-
-    {
-      "message": "Hey"
-    }
-
+Connect to receive any incoming messages sent to the `ACCOUNT_NUMBER`.
