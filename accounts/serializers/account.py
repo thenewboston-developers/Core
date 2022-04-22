@@ -8,3 +8,6 @@ class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = '__all__'
+
+    def create(self, validated_data):
+        raise RuntimeError('Method unavailable')
