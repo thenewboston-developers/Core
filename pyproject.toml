@@ -13,9 +13,12 @@ psycopg2 = "^2.9.3"
 django-filter = "^21.1"
 channels = "^3.0.4"
 channels-redis = "^3.4.0"
+django-split-settings = "^1.1.0"
+PyYAML = "^6.0"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^2.18.1"
+colorlog = "^6.6.0"
 
 [tool.isort]
 multi_line_output = 5
