@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED
 from rest_framework.viewsets import GenericViewSet
 
-from blocks.consumers import BlockConsumer
+from core.blocks.consumers import BlockConsumer
 from ..models.block import Block
 from ..serializers.block import BlockSerializer, BlockSerializerCreate
 

@@ -2,7 +2,7 @@ from django.db import transaction
 from django.db.models import F
 from rest_framework import serializers
 
-from accounts.models.account import Account
+from core.accounts.models.account import Account
 from ..models.block import Block
 
 

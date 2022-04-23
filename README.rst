@@ -1,17 +1,16 @@
-Core
+Project setup
 =============
 
-Core messaging server.
+For project setup see OS-dependent installation instructions:
 
-Poetry is a tool for dependency management and packaging in Python. To install, follow the
-`installation instructions <https://python-poetry.org/docs/#installation>`_.
+    - `<INSTALL.linux.rst>`_
+    - `<INSTALL.macos.rst>`_
 
-Install required packages::
-
-    poetry install
+Example usage
+=============
 
 POST http://127.0.0.1:8000/blocks
-+++++++++++++
+---------------------------------
 
 Request::
 
@@ -37,6 +36,6 @@ Response::
     }
 
 ws://127.0.0.1:8000/ws/blocks/{ACCOUNT_NUMBER}
-+++++++++++++
+----------------------------------------------
 
 Connect to receive any incoming messages sent to the **ACCOUNT_NUMBER**.

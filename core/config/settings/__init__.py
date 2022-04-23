@@ -1,7 +1,7 @@
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = 'django-insecure-mwao7c)2f6hq)6h(jlv5wxb&v4-rg(8^c&n4&%zcq&j6h0^#3t'
+SECRET_KEY = 'django-insecure-^m3d4yj1zic931t3z_b()(xz-_34c3sjeh_4v41rf-2j8qs'
 DEBUG = True
 
 ALLOWED_HOSTS = []
@@ -20,8 +20,8 @@ INSTALLED_APPS = [
     'channels',
 
     # Apps
-    'accounts.apps.AccountsConfig',
-    'blocks.apps.BlocksConfig',
+    'core.accounts.apps.AccountsConfig',
+    'core.blocks.apps.BlocksConfig',
 ]
 
 MIDDLEWARE = [
@@ -34,7 +34,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = 'core.config.urls'
 
 TEMPLATES = [
     {
@@ -52,15 +52,15 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
-ASGI_APPLICATION = 'config.asgi.application'
+WSGI_APPLICATION = 'core.config.wsgi.application'
+ASGI_APPLICATION = 'core.config.asgi.application'
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'bucky',
-        'PASSWORD': '',
+        'NAME': 'core',
+        'USER': 'core',
+        'PASSWORD': 'core',
         'HOST': 'localhost',
         'PORT': '5432',
     }
