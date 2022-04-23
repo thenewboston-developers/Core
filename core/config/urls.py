@@ -2,8 +2,8 @@ from django.contrib import admin
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from accounts.urls import router as account_router
-from blocks.urls import router as block_router
+from core.accounts.urls import router as account_router
+from core.blocks.urls import router as block_router
 
 urlpatterns = [
     path('admin/', admin.site.urls),

@@ -1,6 +1,6 @@
 from django.db import models
 
-from accounts.constants import ACCOUNT_NUMBER_LENGTH
+from core.accounts.constants import ACCOUNT_NUMBER_LENGTH
 
 
 class Block(models.Model):
