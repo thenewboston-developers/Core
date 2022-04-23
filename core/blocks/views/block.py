@@ -6,6 +6,7 @@ from rest_framework.status import HTTP_201_CREATED
 from rest_framework.viewsets import GenericViewSet
 
 from core.blocks.consumers import BlockConsumer
+
 from ..models.block import Block
 from ..serializers.block import BlockSerializer, BlockSerializerCreate
 
@@ -30,15 +31,7 @@ class BlockViewSet(
         block_data = self.get_serializer(block).data
 
         channel_layer = channels.layers.get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            BlockConsumer.group_name(block.recipient),
-            {
-                'type': 'send.block',
-                'message': block_data
-            }
-        )
+        payload = {'type': 'send.block', 'message': block_data}
+        async_to_sync(channel_layer.group_send)(BlockConsumer.group_name(block.recipient), payload)
 
-        return Response(
-            block_data,
-            status=HTTP_201_CREATED,
-        )
+        return Response(block_data, status=HTTP_201_CREATED)

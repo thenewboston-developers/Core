@@ -14,8 +14,12 @@ migrations:
 migrate:
 	 poetry run python -m core.manage migrate
 
+.PHONY: install-pre-commit
+install-pre-commit:
+	poetry run pre-commit uninstall; poetry run pre-commit install
+
 .PHONY: update
-update: install migrate;
+update: install migrate install-pre-commit ;
 
 .PHONY: shell
 shell:
@@ -32,3 +36,7 @@ up-dependencies-only:
 .PHONY: run-server
 run-server:
 	poetry run python -m core.manage runserver 127.0.0.1:8000
+
+.PHONY: lint
+lint:
+	poetry run pre-commit run --all-files

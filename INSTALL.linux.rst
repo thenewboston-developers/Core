@@ -87,6 +87,13 @@ Update
 
     make update
 
+Run quality assurance tools
++++++++++++++++++++++++++++
+
+#. Lint::
+
+    make lint
+
 Run
 +++
 
@@ -104,4 +111,3 @@ Development tools
 #. Make migrations::
 
     make migrations
-

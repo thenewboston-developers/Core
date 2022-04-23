@@ -3,6 +3,7 @@ from django.db.models import F
 from rest_framework import serializers
 
 from core.accounts.models.account import Account
+
 from ..models.block import Block
 
 
@@ -26,11 +27,7 @@ class BlockSerializerCreate(serializers.ModelSerializer):
                 amount = block.amount
 
                 if amount is not None:
-                    Account.objects.filter(
-                        account_number=block.sender
-                    ).update(
-                        balance=F('balance') - amount
-                    )
+                    Account.objects.filter(account_number=block.sender).update(balance=F('balance') - amount)
 
                     recipient = Account.objects.filter(account_number=block.recipient).first()
 
@@ -38,10 +35,7 @@ class BlockSerializerCreate(serializers.ModelSerializer):
                         recipient.balance += amount
                         recipient.save()
                     else:
-                        Account.objects.create(
-                            account_number=block.recipient,
-                            balance=amount
-                        )
+                        Account.objects.create(account_number=block.recipient, balance=amount)
         except Exception as e:
             raise serializers.ValidationError(e)
 

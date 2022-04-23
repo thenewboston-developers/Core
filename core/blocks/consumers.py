@@ -14,15 +14,9 @@ class BlockConsumer(JsonWebsocketConsumer):
             account_number = url_route['kwargs']['account_number']
         else:
             # We need this for testing, as url_route is not available during tests
-            account_number = re.match(
-                '^ws/blocks/(?P<account_number>[a-f0-9]{64})',
-                self.scope['path']
-            ).group(1)
+            account_number = re.match('^ws/blocks/(?P<account_number>[a-f0-9]{64})', self.scope['path']).group(1)
 
-        async_to_sync(self.channel_layer.group_add)(
-            self.group_name(account_number),
-            self.channel_name
-        )
+        async_to_sync(self.channel_layer.group_add)(self.group_name(account_number), self.channel_name)
         self.accept()
 
     @staticmethod
