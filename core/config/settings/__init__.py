@@ -1,99 +1,36 @@
+import logging
+import os.path
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = 'django-insecure-^m3d4yj1zic931t3z_b()(xz-_34c3sjeh_4v41rf-2j8qs'
-DEBUG = True
+from split_settings.tools import include, optional
 
-ALLOWED_HOSTS = []
+from core.core.utils.pytest import is_pytest_running
 
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
-    # Third party
-    'rest_framework',
-    'django_filters',
-    'channels',
+ENVVAR_SETTINGS_PREFIX = 'CORESETTING_'
 
-    # Apps
-    'core.accounts.apps.AccountsConfig',
-    'core.blocks.apps.BlocksConfig',
-]
+LOCAL_SETTINGS_PATH = os.getenv(f'{ENVVAR_SETTINGS_PREFIX}LOCAL_SETTINGS_PATH')
+if not LOCAL_SETTINGS_PATH:
+    # We dedicate local/settings.unittests.py to have reproducible unittest runs
+    LOCAL_SETTINGS_PATH = f'local/settings{".unittests" if is_pytest_running() else ".dev"}.py'
 
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
+if not os.path.isabs(LOCAL_SETTINGS_PATH):
+    LOCAL_SETTINGS_PATH = str(BASE_DIR / LOCAL_SETTINGS_PATH)
 
-ROOT_URLCONF = 'core.config.urls'
+# yapf: disable
+include(
+    'base.py',
+    'logging.py',
+    'rest_framework.py',
+    'channels.py',
+    'custom.py',
+    optional(LOCAL_SETTINGS_PATH),
+    'envvars.py',
+)
+# yapf: enable
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]
+logging.captureWarnings(True)
 
-WSGI_APPLICATION = 'core.config.wsgi.application'
-ASGI_APPLICATION = 'core.config.asgi.application'
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'core',
-        'USER': 'core',
-        'PASSWORD': 'core',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
-
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            'hosts': [('127.0.0.1', 6379)],
-        },
-    },
-}
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
-
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
-USE_I18N = True
-USE_TZ = True
-
-STATIC_URL = 'static/'
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+if not is_pytest_running():
+    assert SECRET_KEY is not NotImplemented  # type: ignore # noqa: F821
