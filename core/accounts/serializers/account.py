@@ -7,7 +7,11 @@ class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = '__all__'
+        fields = ('account_number', 'avatar', 'balance', 'display_name')
+        read_only_fields = (
+            'account_number',
+            'balance',
+        )
 
     def create(self, validated_data):
         # TODO(dmu) HIGH: Introduce a better way of disabling account creation
