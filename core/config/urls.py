@@ -1,16 +1,13 @@
 from django.contrib import admin
-from django.urls import path
-from rest_framework.routers import DefaultRouter
+from django.urls import include, path
 
-from core.accounts.urls import router as account_router
-from core.blocks.urls import router as block_router
+import core.accounts.urls
+import core.blocks.urls
+
+API_PREFIX = 'api/'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path(API_PREFIX, include(core.accounts.urls)),
+    path(API_PREFIX, include(core.blocks.urls)),
 ]
-
-router = DefaultRouter(trailing_slash=False)
-router.registry.extend(account_router.registry)
-router.registry.extend(block_router.registry)
-
-urlpatterns += router.urls

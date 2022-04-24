@@ -40,3 +40,14 @@ run-server:
 .PHONY: lint
 lint:
 	poetry run pre-commit run --all-files
+
+.PHONY: test
+test:
+	poetry run pytest -v -rs -n auto --show-capture=no
+
+.PHONY: test-stepwise
+test-stepwise:
+	poetry run pytest --reuse-db --sw -vv --show-capture=no
+
+.PHONY: lint-and-test
+lint-and-test: lint test ;

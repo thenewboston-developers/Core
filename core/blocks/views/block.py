@@ -11,11 +11,7 @@ from ..models.block import Block
 from ..serializers.block import BlockSerializer, BlockSerializerCreate
 
 
-class BlockViewSet(
-    CreateModelMixin,
-    GenericViewSet,
-    ListModelMixin,
-):
+class BlockViewSet(CreateModelMixin, GenericViewSet, ListModelMixin):
     filterset_fields = ['amount', 'recipient', 'sender']
     queryset = Block.objects.all()
     serializer_class = BlockSerializer

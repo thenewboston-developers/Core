@@ -65,6 +65,9 @@ venv
 venv.bak/
 venv/
 
+# Misc
+.mypy_cache
+
 # IDEs
 .DS_Store
 .idea

@@ -10,4 +10,4 @@ class Block(models.Model):
     payload = models.JSONField(null=True)
 
     def __str__(self):
-        return f'{self.id} | {self.amount}'
+        return f'{self.id} | {self.sender} -> {self.recipient} | {self.amount}'
