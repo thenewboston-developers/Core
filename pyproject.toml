@@ -37,6 +37,7 @@ dedent_closing_brackets = true
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "core.config.settings"
+django_find_project = false
 python_files = "test_*.py"
 testpaths = ["core"]
 filterwarnings = "ignore::DeprecationWarning:^(?!node\\.).*:"
