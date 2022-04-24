@@ -111,3 +111,4 @@ Development tools
 #. Make migrations::
 
     make migrations
+
