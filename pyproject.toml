@@ -19,6 +19,10 @@ PyYAML = "^6.0"
 [tool.poetry.dev-dependencies]
 pre-commit = "^2.18.1"
 colorlog = "^6.6.0"
+pytest = "^7.1.2"
+pytest-django = "^4.5.2"
+pytest-xdist = "^2.5.0"
+model-bakery = "^1.5.0"
 
 [tool.isort]
 multi_line_output = 5
@@ -30,6 +34,12 @@ align_closing_bracket_with_visual_indent = true
 coalesce_brackets = true
 column_limit = 119
 dedent_closing_brackets = true
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "core.config.settings"
+python_files = "test_*.py"
+testpaths = ["core"]
+filterwarnings = "ignore::DeprecationWarning:^(?!node\\.).*:"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
