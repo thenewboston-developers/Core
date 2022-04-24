@@ -1,7 +1,8 @@
 import pytest
 
+from core.accounts.models import Account
 
-@pytest.mark.django_db
+
 def test_retrieve_account(sender_account, api_client):
     response = api_client.get(f'/api/accounts/{sender_account.account_number}')
     assert response.status_code == 200
@@ -21,7 +22,6 @@ def test_retrieve_account(sender_account, api_client):
         ('balance', 10001, False),
     )
 )
-@pytest.mark.django_db
 def test_update_account(sender_account, attribute, value, is_success, api_client):
     original_value = getattr(sender_account, attribute)
     assert original_value != value
@@ -49,3 +49,17 @@ def test_update_account(sender_account, attribute, value, is_success, api_client
 
 # TODO(dmu) CRITICAL: Disable PUT requests, so balance cannot be updated directly
 #                     https://github.com/thenewboston-developers/Core/issues/30
+
+
+@pytest.mark.django_db
+def test_cannot_create_account(api_client):
+    assert not Account.objects.exists()
+    payload = {
+        'account_number': '0000000000000000000000000000000000000000000000000000000000000000',
+        'avatar': 'https://example.com/me.jpg',
+        'balance': 1234,
+        'display_name': 'Display Name',
+    }
+    response = api_client.post('/api/accounts', payload)
+    assert response.status_code == 404
+    assert not Account.objects.exists()

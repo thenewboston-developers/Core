@@ -1,9 +1,6 @@
-import pytest
-
 from core.blocks.models import Block
 
 
-@pytest.mark.django_db
 def test_create_block(sender_account, api_client):
     assert not Block.objects.exists()
 
