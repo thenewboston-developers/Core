@@ -112,3 +112,4 @@ Development tools
 
     make migrations
 
+This is a technical last line to serve as `end-of-file-fixer` workaround.

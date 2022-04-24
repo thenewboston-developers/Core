@@ -1,4 +1,4 @@
-SECRET_KEY = NotImplementedError
+SECRET_KEY = NotImplemented
 DEBUG = False
 
 ALLOWED_HOSTS = []
