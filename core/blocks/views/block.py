@@ -11,6 +11,12 @@ from ..models.block import Block
 from ..serializers.block import BlockSerializer, BlockSerializerCreate
 
 
+def send(block_data):
+    channel_layer = channels.layers.get_channel_layer()
+    payload = {'type': 'send.block', 'message': block_data}
+    async_to_sync(channel_layer.group_send)(BlockConsumer.group_name(block_data['recipient']), payload)
+
+
 class BlockViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
     # TODO(dmu) MEDIUM: Why do we need `filterset_fields` given that `filter_backends` is not set?
     filterset_fields = ('amount', 'recipient', 'sender')
@@ -26,10 +32,9 @@ class BlockViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
         )
         serializer.is_valid(raise_exception=True)
         block = serializer.save()
+        # TODO(dmu) MEDIUM: Consider not serializing the block again
         block_data = self.get_serializer(block).data
 
-        channel_layer = channels.layers.get_channel_layer()
-        payload = {'type': 'send.block', 'message': block_data}
-        async_to_sync(channel_layer.group_send)(BlockConsumer.group_name(block.recipient), payload)
+        send(block_data)
 
         return Response(block_data, status=HTTP_201_CREATED)

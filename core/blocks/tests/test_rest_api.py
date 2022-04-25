@@ -1,8 +1,14 @@
+from unittest.mock import patch
+
 import pytest
+from asgiref.sync import sync_to_async
+from channels.testing import WebsocketCommunicator
 from model_bakery import baker
 
 from core.accounts.models import Account
 from core.blocks.models import Block
+from core.blocks.views.block import send as block_send
+from core.config.asgi import application
 
 
 def test_create_block(sender_account, recipient_account_number, api_client):
@@ -17,7 +23,9 @@ def test_create_block(sender_account, recipient_account_number, api_client):
             'message': 'Hey'
         }
     }
-    response = api_client.post('/api/blocks', payload)
+    with patch('core.blocks.views.block.send') as send_mock:
+        response = api_client.post('/api/blocks', payload)
+
     assert response.status_code == 201
     response_json = response.json()
     assert isinstance(response_json.pop('id'), int)
@@ -39,6 +47,23 @@ def test_create_block(sender_account, recipient_account_number, api_client):
 
     recipient_account = Account.objects.get(account_number=recipient_account_number)
     assert recipient_account.balance == 5
+
+    send_mock.assert_called_once_with(dict(payload, id=block.id))
+
+
+@pytest.mark.asyncio
+async def test_block_send(recipient_account_number):
+    communicator = WebsocketCommunicator(application, f'ws/blocks/{recipient_account_number}')
+    connected, _ = await communicator.connect()
+    assert connected
+
+    message_to_send = {'message': 'Hi', 'recipient': recipient_account_number}
+    await sync_to_async(block_send)(message_to_send)
+
+    received_message = await communicator.receive_json_from()
+    assert message_to_send == received_message
+
+    await communicator.disconnect()
 
 
 @pytest.mark.django_db
