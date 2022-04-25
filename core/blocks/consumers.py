@@ -1,5 +1,3 @@
-import re
-
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
 
@@ -8,21 +6,16 @@ class BlockConsumer(JsonWebsocketConsumer):
 
     def connect(self):
         """Accepts an incoming socket"""
-        url_route = self.scope.get('url_route')
-
-        if url_route:
-            account_number = url_route['kwargs']['account_number']
-        else:
-            # We need this for testing, as url_route is not available during tests
-            account_number = re.match('^ws/blocks/(?P<account_number>[a-f0-9]{64})', self.scope['path']).group(1)
-
+        # TODO(dmu) MEDIUM: For some reason reusing websocket_connect() for adding groups to channel leads to
+        #                   timeout error in unittest. Fix it
+        account_number = self.scope['url_route']['kwargs']['account_number']
         async_to_sync(self.channel_layer.group_add)(self.group_name(account_number), self.channel_name)
-        self.accept()
+        return super().connect()
 
     @staticmethod
     def group_name(account_number):
         """Name of group where messages will be broadcast"""
-        return 'blocks_%s' % account_number
+        return f'blocks_{account_number}'
 
     def send_block(self, event):
         """Send block to group"""
