@@ -7,7 +7,7 @@ from core.core.models import CustomModel
 class Block(CustomModel):
     sender = models.CharField(max_length=ACCOUNT_NUMBER_LENGTH)
     recipient = models.CharField(max_length=ACCOUNT_NUMBER_LENGTH)
-    amount = models.PositiveBigIntegerField(blank=True, null=True)
+    amount = models.PositiveBigIntegerField()
     payload = models.JSONField(null=True)
 
     def __str__(self):
