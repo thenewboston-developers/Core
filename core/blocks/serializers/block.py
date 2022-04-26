@@ -12,15 +12,8 @@ class BlockSerializer(ModelSerializer):
         model = Block
         fields = '__all__'
 
-
-class BlockSerializerCreate(ModelSerializer):
-
-    class Meta:
-        model = Block
-        fields = '__all__'
-
     def create(self, validated_data):
-        # TODO(dmu) MEDIUM: Consider moving the logic to core.blocks.views.block.BlockViewSet
+        # TODO(dmu) MEDIUM: Consider moving the logic to core.blocks.views.block.BlockViewSet.perform_create()
         block = super().create(validated_data)
 
         # TODO(dmu) MEDIUM: It looks more consistent to let amount be 0, but not None
@@ -55,7 +48,7 @@ class BlockSerializerCreate(ModelSerializer):
         raise RuntimeError('Method unavailable')
 
     def validate(self, data):
-        data = super(BlockSerializerCreate, self).validate(data)
+        data = super().validate(data)
 
         if data['sender'] == data['recipient']:
             raise ValidationError('Sender and recipient can not be the same')
