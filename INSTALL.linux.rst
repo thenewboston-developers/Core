@@ -105,6 +105,13 @@ Run
 
     make run-server
 
+Run dockerized
+++++++++++++++
+
+#. Run dockerized::
+
+    make run-dockerized
+
 Development tools
 +++++++++++++++++
 

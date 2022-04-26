@@ -1,7 +1,8 @@
 SECRET_KEY = NotImplemented
 DEBUG = False
 
-ALLOWED_HOSTS = []
+# TODO(dmu) MEDIUM: Consider a more secure value for `ALLOWED_HOSTS`
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -84,4 +85,5 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # noqa: F821
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
