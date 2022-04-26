@@ -11,9 +11,15 @@ from core.blocks.views.block import send as block_send
 from core.config.asgi import application
 
 
-def test_create_block(sender_account, recipient_account_number, api_client):
+@pytest.mark.parametrize('does_recipient_exist', (False, True))
+def test_create_block(sender_account, recipient_account_number, does_recipient_exist, api_client):
     assert not Block.objects.exists()
     assert not Account.objects.filter(account_number=recipient_account_number).exists()
+    if does_recipient_exist:
+        recipient_initial_balance = 1000
+        baker.make('accounts.Account', account_number=recipient_account_number, balance=recipient_initial_balance)
+    else:
+        recipient_initial_balance = 0
 
     payload = {
         'sender': sender_account.account_number,
@@ -46,7 +52,7 @@ def test_create_block(sender_account, recipient_account_number, api_client):
     assert block.payload == payload['payload']
 
     recipient_account = Account.objects.get(account_number=recipient_account_number)
-    assert recipient_account.balance == 5
+    assert recipient_account.balance == recipient_initial_balance + 5
 
     send_mock.assert_called_once_with(dict(payload, id=block.id))
 
@@ -64,6 +70,79 @@ async def test_block_send(recipient_account_number):
     assert message_to_send == received_message
 
     await communicator.disconnect()
+
+
+@pytest.mark.django_db
+def test_cannot_create_block_if_sender_account_does_not_exist(
+    sender_account_number, recipient_account_number, api_client
+):
+    assert not Account.objects.filter(account_number=sender_account_number).exists()
+
+    payload = {
+        'sender': sender_account_number,
+        'recipient': recipient_account_number,
+        'amount': 5,
+        'payload': {
+            'message': 'Hey'
+        }
+    }
+    response = api_client.post('/api/blocks', payload)
+    assert response.status_code == 400
+    assert response.json() == {'sender': [{'code': 'invalid', 'message': 'Sender account does not exist'}]}
+
+
+def test_cannot_create_block_if_sender_balance_is_not_enough(sender_account, recipient_account_number, api_client):
+    payload = {
+        'sender': sender_account.account_number,
+        'recipient': recipient_account_number,
+        'amount': sender_account.balance + 1,
+        'payload': {
+            'message': 'Hey'
+        }
+    }
+    response = api_client.post('/api/blocks', payload)
+    assert response.status_code == 400
+    assert response.json() == {
+        'amount': [{
+            'code': 'invalid',
+            'message': 'Amount is greater than sender account balance'
+        }]
+    }
+
+
+@pytest.mark.django_db
+def test_cannot_create_block_if_sender_and_recipient_are_the_same(sender_account_number, api_client):
+    payload = {
+        'sender': sender_account_number,
+        'recipient': sender_account_number,
+        'amount': 5,
+        'payload': {
+            'message': 'Hey'
+        }
+    }
+    response = api_client.post('/api/blocks', payload)
+    assert response.status_code == 400
+    assert response.json() == {
+        'non_field_errors': [{
+            'code': 'invalid',
+            'message': 'Sender and recipient can not be the same'
+        }]
+    }
+
+
+@pytest.mark.django_db
+def test_cannot_create_block_if_amount_is_zero(sender_account_number, api_client):
+    payload = {
+        'sender': sender_account_number,
+        'recipient': sender_account_number,
+        'amount': 0,
+        'payload': {
+            'message': 'Hey'
+        }
+    }
+    response = api_client.post('/api/blocks', payload)
+    assert response.status_code == 400
+    assert response.json() == {'amount': [{'code': 'invalid', 'message': 'Amount must be greater than 0'}]}
 
 
 @pytest.mark.django_db

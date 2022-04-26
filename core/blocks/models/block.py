@@ -1,9 +1,10 @@
 from django.db import models
 
 from core.accounts.constants import ACCOUNT_NUMBER_LENGTH
+from core.core.models import CustomModel
 
 
-class Block(models.Model):
+class Block(CustomModel):
     sender = models.CharField(max_length=ACCOUNT_NUMBER_LENGTH)
     recipient = models.CharField(max_length=ACCOUNT_NUMBER_LENGTH)
     amount = models.PositiveBigIntegerField(blank=True, null=True)

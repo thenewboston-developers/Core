@@ -14,4 +14,9 @@ def recipient_account_number():
 
 @pytest.fixture
 def sender_account(sender_account_number, db):
-    return baker.make('accounts.Account', account_number=sender_account_number)
+    return baker.make('accounts.Account', account_number=sender_account_number, balance=20000)
+
+
+@pytest.fixture
+def recipient_account(sender_account_number, db):
+    return baker.make('accounts.Account', account_number=sender_account_number, balance=30000)

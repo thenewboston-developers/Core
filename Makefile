@@ -66,5 +66,9 @@ test:
 test-stepwise:
 	poetry run pytest --reuse-db --sw -vv --show-capture=no
 
+.PHONY: test-with-coverage
+test-with-coverage:
+	poetry run pytest -vv --cov=core --cov-report=html
+
 .PHONY: lint-and-test
 lint-and-test: lint test ;
