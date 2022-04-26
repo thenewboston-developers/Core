@@ -1,4 +1,3 @@
-from django.db import transaction
 from django.db.models import F
 from rest_framework import serializers
 
@@ -26,23 +25,19 @@ class BlockSerializerCreate(serializers.ModelSerializer):
         # TODO(dmu) HIGH: Use implementation more consistent with ModelSerializer
         #                 https://github.com/thenewboston-developers/Core/issues/24
         try:
-            # TODO(dmu) HIGH: Use atomic requests instead of explicit transaction management with
-            #                 transaction.atomic()
-            #                 https://github.com/thenewboston-developers/Core/issues/24
-            with transaction.atomic():
-                block = Block.objects.create(**validated_data)
-                amount = block.amount
+            block = Block.objects.create(**validated_data)
+            amount = block.amount
 
-                if amount is not None:
-                    Account.objects.filter(account_number=block.sender).update(balance=F('balance') - amount)
+            if amount is not None:
+                Account.objects.filter(account_number=block.sender).update(balance=F('balance') - amount)
 
-                    recipient = Account.objects.filter(account_number=block.recipient).first()
+                recipient = Account.objects.filter(account_number=block.recipient).first()
 
-                    if recipient:
-                        recipient.balance += amount
-                        recipient.save()
-                    else:
-                        Account.objects.create(account_number=block.recipient, balance=amount)
+                if recipient:
+                    recipient.balance += amount
+                    recipient.save()
+                else:
+                    Account.objects.create(account_number=block.recipient, balance=amount)
         except Exception as e:
             # TODO(dmu) HIGH: Avoid too broad exceptions
             #                 https://github.com/thenewboston-developers/Core/issues/24
