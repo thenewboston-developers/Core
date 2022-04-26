@@ -2,6 +2,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import ModelSerializer
 
 from core.accounts.models.account import Account
+from core.core.utils.cryptography import is_dict_signature_valid
 
 from ..models.block import Block
 
@@ -44,7 +45,7 @@ class BlockSerializer(ModelSerializer):
 
     def update(self, instance, validated_data):
         # TODO(dmu) HIGH: Introduce a better way of disabling block update
-        #                 https://github.com/thenewboston-developers/Core/issues/24
+        #                 https://github.com/thenewboston-developers/Core/issues/30
         raise RuntimeError('Method unavailable')
 
     def validate(self, data):
@@ -53,6 +54,9 @@ class BlockSerializer(ModelSerializer):
         sender = data['sender']
         if sender == data['recipient']:
             raise ValidationError('Sender and recipient can not be the same')
+
+        if not is_dict_signature_valid(data):
+            raise ValidationError({'signature': ['Invalid']})
 
         amount = data['amount']
         assert amount >= 0

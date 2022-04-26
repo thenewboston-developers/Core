@@ -64,7 +64,7 @@ test:
 
 .PHONY: test-stepwise
 test-stepwise:
-	poetry run pytest --reuse-db --sw -vv --show-capture=no
+	poetry run pytest --reuse-db --sw -vv
 
 .PHONY: test-with-coverage
 test-with-coverage:
