@@ -1,0 +1,46 @@
+name: Quality Assurance
+
+on: [pull_request]
+
+jobs:
+# github does not support dependencies on other workflows therefore we have to duplicate the code
+# TODO(dmu) LOW: Fix this non-DRY approach if possible
+# QUALITY-ASSURANCE-START
+  quality-assurance:
+    name: Quality Assurance
+    runs-on: ubuntu-latest
+    container: python:3.10.4-buster
+
+    services:
+      # TODO(dmu) LOW: This section duplicates services already defined in `docker-compose.yml`.
+      #                Is there a way to make it DRY?
+      db:
+        image: postgres:14.2-alpine
+        env:
+          POSTGRES_DB: core
+          POSTGRES_USER: core
+          POSTGRES_PASSWORD: core
+
+      redis:
+        image: redis:6.2.6-alpine
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run Poetry image
+        uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: 1.1.13
+
+      - name: Install
+        run: make install && make install-pre-commit
+
+      - name: Lint
+        run: make lint
+
+      - name: Test
+        run: make test
+        env:
+          CORESETTING_DATABASES: '{"default":{"HOST":"db"}}'
+          CORESETTING_CHANNEL_LAYERS: '{"default":{"CONFIG":{"hosts":[["redis", 6379]]}}}'
+# QUALITY-ASSURANCE-END

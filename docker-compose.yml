@@ -6,9 +6,9 @@ services:
     image: postgres:14.2-alpine
     restart: unless-stopped
     environment:
-      - POSTGRES_DB=core
-      - POSTGRES_USER=core
-      - POSTGRES_PASSWORD=core
+      POSTGRES_DB: core
+      POSTGRES_USER: core
+      POSTGRES_PASSWORD: core
     volumes:
       - postgresql-data:/var/lib/postgresql/data
 
