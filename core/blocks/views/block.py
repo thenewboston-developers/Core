@@ -16,8 +16,6 @@ def send(block_data):
 
 
 class BlockViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
-    # TODO(dmu) MEDIUM: Why do we need `filterset_fields` given that `filter_backends` is not set?
-    filterset_fields = ('amount', 'recipient', 'sender')
     queryset = Block.objects.order_by('id').all()
     serializer_class = BlockSerializer
 

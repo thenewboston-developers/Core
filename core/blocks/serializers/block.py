@@ -14,20 +14,20 @@ class BlockSerializer(ModelSerializer):
 
     def create(self, validated_data):
         # TODO(dmu) MEDIUM: Consider moving the logic to core.blocks.views.block.BlockViewSet.perform_create()
+        #                   Another option is to move it Django signal handler
         block = super().create(validated_data)
 
-        # TODO(dmu) MEDIUM: It looks more consistent to let amount be 0, but not None
         amount = block.amount
-        if amount is None:
+        assert amount >= 0
+        if amount == 0:  # no need to update balances or create recipient account if there is no coin transfer
             return block
 
-        # This more consistent than validating in separate method, because of setting a database lock on the row
+        # It is crucial to make select_for_update()
         sender_account = Account.objects.select_for_update().get_or_none(account_number=block.sender)
-        if sender_account is None:
-            raise ValidationError({'sender': ['Sender account does not exist']})
 
-        if sender_account.balance < amount:
-            raise ValidationError({'amount': ['Amount is greater than sender account balance']})
+        # Just assert here, because it must have been validated in validate()
+        assert sender_account
+        assert sender_account.balance >= amount
 
         sender_account.balance -= amount
         sender_account.save()
@@ -50,15 +50,21 @@ class BlockSerializer(ModelSerializer):
     def validate(self, data):
         data = super().validate(data)
 
-        if data['sender'] == data['recipient']:
+        sender = data['sender']
+        if sender == data['recipient']:
             raise ValidationError('Sender and recipient can not be the same')
 
+        amount = data['amount']
+        assert amount >= 0
+        if amount == 0:  # no need for remaining validations since we are not sending coins
+            return data
+
+        # It is crucial to make select_for_update(), so we get database row lock till the moment of actual update
+        sender_account = Account.objects.select_for_update().get_or_none(account_number=sender)
+        if sender_account is None:
+            raise ValidationError({'sender': ['Sender account does not exist']})
+
+        if sender_account.balance < data['amount']:
+            raise ValidationError({'amount': ['Amount is greater than sender account balance']})
+
         return data
-
-    @staticmethod
-    def validate_amount(amount):
-        # TODO(dmu) MEDIUM: Instead of this validation use min_value=1 on model level or minimum value validator
-        if amount <= 0:
-            raise ValidationError('Amount must be greater than 0')
-
-        return amount

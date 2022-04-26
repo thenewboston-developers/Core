@@ -111,10 +111,10 @@ def test_cannot_create_block_if_sender_balance_is_not_enough(sender_account, rec
 
 
 @pytest.mark.django_db
-def test_cannot_create_block_if_sender_and_recipient_are_the_same(sender_account_number, api_client):
+def test_cannot_create_block_if_sender_and_recipient_are_the_same(sender_account, api_client):
     payload = {
-        'sender': sender_account_number,
-        'recipient': sender_account_number,
+        'sender': sender_account.account_number,
+        'recipient': sender_account.account_number,
         'amount': 5,
         'payload': {
             'message': 'Hey'
@@ -131,18 +131,76 @@ def test_cannot_create_block_if_sender_and_recipient_are_the_same(sender_account
 
 
 @pytest.mark.django_db
-def test_cannot_create_block_if_amount_is_zero(sender_account_number, api_client):
+def test_cannot_create_block_if_amount_is_none(sender_account, recipient_account_number, api_client):
     payload = {
-        'sender': sender_account_number,
-        'recipient': sender_account_number,
-        'amount': 0,
+        'sender': sender_account.account_number,
+        'recipient': recipient_account_number,
+        'amount': None,
         'payload': {
             'message': 'Hey'
         }
     }
     response = api_client.post('/api/blocks', payload)
     assert response.status_code == 400
-    assert response.json() == {'amount': [{'code': 'invalid', 'message': 'Amount must be greater than 0'}]}
+    assert response.json() == {'amount': [{'code': 'null', 'message': 'This field may not be null.'}]}
+
+
+@pytest.mark.django_db
+def test_cannot_create_block_if_amount_is_negative(sender_account, recipient_account_number, api_client):
+    payload = {
+        'sender': sender_account.account_number,
+        'recipient': recipient_account_number,
+        'amount': -1,
+        'payload': {
+            'message': 'Hey'
+        }
+    }
+    response = api_client.post('/api/blocks', payload)
+    assert response.status_code == 400
+    assert response.json() == {
+        'amount': [{
+            'code': 'min_value',
+            'message': 'Ensure this value is greater than or equal to 0.'
+        }]
+    }
+
+
+def test_create_block_if_amount_is_zero(sender_account, recipient_account_number, api_client):
+    assert not Block.objects.exists()
+    assert not Account.objects.filter(account_number=recipient_account_number).exists()
+
+    payload = {
+        'sender': sender_account.account_number,
+        'recipient': recipient_account_number,
+        'amount': 0,
+        'payload': {
+            'message': 'Hey'
+        }
+    }
+    with patch('core.blocks.views.block.send') as send_mock:
+        response = api_client.post('/api/blocks', payload)
+
+    assert response.status_code == 201
+    response_json = response.json()
+    assert isinstance(response_json.pop('id'), int)
+    assert response_json == {
+        'sender': sender_account.account_number,
+        'recipient': recipient_account_number,
+        'amount': 0,
+        'payload': {
+            'message': 'Hey'
+        },
+    }
+    query = Block.objects.filter(sender=payload['sender'])
+    assert query.count() == 1
+    block = query.get()
+    assert block.sender == payload['sender']
+    assert block.recipient == payload['recipient']
+    assert block.amount == payload['amount']
+    assert block.payload == payload['payload']
+
+    assert not Account.objects.filter(account_number=recipient_account_number).exists()
+    send_mock.assert_called_once_with(dict(payload, id=block.id))
 
 
 @pytest.mark.django_db
