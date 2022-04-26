@@ -1,9 +1,11 @@
 from django.db import models
 
+from core.core.models import CustomModel
+
 from ..constants import ACCOUNT_NUMBER_LENGTH, DISPLAY_NAME_MAX_LENGTH
 
 
-class Account(models.Model):
+class Account(CustomModel):
     account_number = models.CharField(max_length=ACCOUNT_NUMBER_LENGTH, primary_key=True)
     avatar = models.URLField(blank=True)
     balance = models.PositiveBigIntegerField()
