@@ -1,9 +1,10 @@
 from django.db import models
 
+from core.core.constants import ACCOUNT_NUMBER_LENGTH
 from core.core.models import CustomModel
 from core.core.validators import HexStringValidator
 
-from ..constants import ACCOUNT_NUMBER_LENGTH, DISPLAY_NAME_MAX_LENGTH
+from ..constants import DISPLAY_NAME_MAX_LENGTH
 
 
 class Account(CustomModel):
