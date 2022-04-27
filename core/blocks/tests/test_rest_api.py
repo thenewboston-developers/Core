@@ -254,6 +254,29 @@ def test_cannot_create_block_without_signature(sender_key_pair, sender_account, 
     send_mock.assert_not_called()
 
 
+def test_cannot_update_block(sender_key_pair, sender_account, recipient_account_number, api_client):
+    block = baker.make('blocks.Block', sender=sender_account.account_number, recipient='1' * 64)
+
+    payload = {'recipient': '2' * 64}
+    response = api_client.patch(f'/api/blocks/{block.id}', payload)
+    assert response.status_code == 404
+    block.refresh_from_db()
+    assert block.recipient == '1' * 64
+
+    payload = {
+        'sender': sender_account.account_number,
+        'recipient': '2' * 64,
+        'amount': 5,
+        'payload': {
+            'message': 'Hey'
+        },
+    }
+    response = api_client.put(f'/api/blocks/{block.id}', payload)
+    assert response.status_code == 404
+    block.refresh_from_db()
+    assert block.recipient == '1' * 64
+
+
 @pytest.mark.django_db
 def test_list_blocks(api_client):
     response = api_client.get('/api/blocks')
