@@ -31,7 +31,7 @@ wget https://raw.githubusercontent.com/thenewboston-developers/Core/master/docke
 echo 'Creating/updating .env file...'
 grep -q -o CORESETTING_SECRET_KEY .env 2> /dev/null || echo "CORESETTING_SECRET_KEY=$$(xxd -c 48 -l 48 -p /dev/urandom)" >> .env
 
-docker compose pull
+docker compose pull  # Ensure latest image is downloaded locally (even if tag did not change)
 
 echo 'Starting the Core API...'
 docker compose up -d --force-recreate

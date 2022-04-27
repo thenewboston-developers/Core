@@ -61,6 +61,7 @@ run-dockerized-build: build dot-env
 run-dockerized-from-registry: dot-env
 	echo '(username=github username; password=github personal access token (not github password)'
 	docker login ghcr.io
+	docker compose pull
 	docker compose up --no-build --force-recreate
 
 .PHONY: lint
