@@ -1,6 +1,6 @@
 from django.db import models
 
-from core.accounts.constants import ACCOUNT_NUMBER_LENGTH, SIGNATURE_LENGTH
+from core.core.constants import ACCOUNT_NUMBER_LENGTH, SIGNATURE_LENGTH
 from core.core.models import CustomModel
 from core.core.validators import HexStringValidator
 

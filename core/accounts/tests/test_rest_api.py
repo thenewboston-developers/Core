@@ -1,6 +1,8 @@
 import pytest
 
 from core.accounts.models import Account
+from core.core.utils.collections import remove_keys
+from core.core.utils.cryptography import sign_dict
 
 
 def test_retrieve_account(sender_account, api_client):
@@ -22,29 +24,58 @@ def test_retrieve_account(sender_account, api_client):
         ('balance', 10001, False),
     )
 )
-def test_update_account(sender_account, attribute, value, is_success, api_client):
+def test_update_account(sender_account, sender_key_pair, attribute, value, is_success, api_client):
     original_value = getattr(sender_account, attribute)
     assert original_value != value
 
     payload = {attribute: value}
+    sign_dict(payload, sender_key_pair.private)
     response = api_client.patch(f'/api/accounts/{sender_account.account_number}', payload)
     sender_account.refresh_from_db()
 
-    # TODO(dmu) LOW: DRF has an issue of not reporting an error if a read-only field is requested for update
-    #                Maybe we should fix it and respond with HTTP400 in such cases
-    assert response.status_code == 200
-    expected_response_body = {
-        'account_number': sender_account.account_number,
-        'avatar': sender_account.avatar,
-        'balance': sender_account.balance,
-        'display_name': sender_account.display_name,
-    }
     if is_success:
-        assert response.json() == expected_response_body | payload
+        assert response.status_code == 200
+        expected_response_body = {
+            'account_number': sender_account.account_number,
+            'avatar': sender_account.avatar,
+            'balance': sender_account.balance,
+            'display_name': sender_account.display_name,
+        }
+        assert response.json() == expected_response_body | remove_keys(payload, ('signature',))
         assert getattr(sender_account, attribute) == value
     else:
-        assert response.json() == expected_response_body
+        assert response.status_code == 400
+        assert response.json() == {
+            'non_field_errors': [{
+                'code': 'invalid',
+                'message': f'Readonly field(s): {attribute}'
+            }]
+        }
         assert getattr(sender_account, attribute) == original_value
+
+
+def test_cannot_update_account_with_invalid_signature(sender_account, api_client):
+    original_value = sender_account.avatar
+
+    payload = {'avatar': 'https://example.com/avatar.jpg', 'signature': '0' * 128}
+    response = api_client.patch(f'/api/accounts/{sender_account.account_number}', payload)
+
+    assert response.status_code == 400
+    assert response.json() == {'signature': [{'code': 'invalid', 'message': 'Invalid'}]}
+    sender_account.refresh_from_db()
+    assert sender_account.avatar == original_value
+
+
+def test_cannot_update_account_without_signature(sender_account, api_client):
+    original_value = sender_account.avatar
+
+    payload = {'avatar': 'https://example.com/avatar.jpg'}
+    response = api_client.patch(f'/api/accounts/{sender_account.account_number}', payload)
+
+    assert response.status_code == 400
+    assert response.json() == {'signature': [{'code': 'invalid', 'message': 'This field is required.'}]}
+    sender_account.refresh_from_db()
+    assert sender_account.avatar == original_value
 
 
 def test_cannot_put_account(sender_account, api_client):

@@ -1,3 +1,6 @@
+from typing import Collection
+
+
 def deep_update(base_dict, update_with):
     for key, value in update_with.items():
         if isinstance(value, dict):
@@ -10,3 +13,10 @@ def deep_update(base_dict, update_with):
             base_dict[key] = value
 
     return base_dict
+
+
+def remove_keys(dict_: dict, keys: Collection):
+    for key in keys:
+        del dict_[key]
+
+    return dict_

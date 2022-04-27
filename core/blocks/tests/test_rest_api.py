@@ -30,7 +30,7 @@ def test_create_block(sender_key_pair, sender_account, recipient_account_number,
             'message': 'Hey'
         }
     }
-    sign_dict(sender_key_pair.private, payload)
+    sign_dict(payload, sender_key_pair.private)
     with patch('core.blocks.views.block.send') as send_mock:
         response = api_client.post('/api/blocks', payload)
 
@@ -82,7 +82,7 @@ def test_cannot_create_block_if_sender_account_does_not_exist(
             'message': 'Hey'
         }
     }
-    sign_dict(sender_key_pair.private, payload)
+    sign_dict(payload, sender_key_pair.private)
     response = api_client.post('/api/blocks', payload)
     assert response.status_code == 400
     assert response.json() == {'sender': [{'code': 'invalid', 'message': 'Sender account does not exist'}]}
@@ -99,7 +99,7 @@ def test_cannot_create_block_if_sender_balance_is_not_enough(
             'message': 'Hey'
         }
     }
-    sign_dict(sender_key_pair.private, payload)
+    sign_dict(payload, sender_key_pair.private)
     response = api_client.post('/api/blocks', payload)
     assert response.status_code == 400
     assert response.json() == {
@@ -120,7 +120,7 @@ def test_cannot_create_block_if_sender_and_recipient_are_the_same(sender_key_pai
             'message': 'Hey'
         }
     }
-    sign_dict(sender_key_pair.private, payload)
+    sign_dict(payload, sender_key_pair.private)
     response = api_client.post('/api/blocks', payload)
     assert response.status_code == 400
     assert response.json() == {
@@ -141,7 +141,7 @@ def test_cannot_create_block_if_amount_is_none(sender_key_pair, sender_account, 
             'message': 'Hey'
         }
     }
-    sign_dict(sender_key_pair.private, payload)
+    sign_dict(payload, sender_key_pair.private)
     response = api_client.post('/api/blocks', payload)
     assert response.status_code == 400
     assert response.json() == {'amount': [{'code': 'null', 'message': 'This field may not be null.'}]}
@@ -159,7 +159,7 @@ def test_cannot_create_block_if_amount_is_negative(
             'message': 'Hey'
         }
     }
-    sign_dict(sender_key_pair.private, payload)
+    sign_dict(payload, sender_key_pair.private)
     response = api_client.post('/api/blocks', payload)
     assert response.status_code == 400
     assert response.json() == {
@@ -182,7 +182,7 @@ def test_create_block_if_amount_is_zero(sender_key_pair, sender_account, recipie
             'message': 'Hey'
         }
     }
-    sign_dict(sender_key_pair.private, payload)
+    sign_dict(payload, sender_key_pair.private)
     with patch('core.blocks.views.block.send') as send_mock:
         response = api_client.post('/api/blocks', payload)
 
