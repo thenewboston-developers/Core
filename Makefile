@@ -43,7 +43,7 @@ dbshell:
 .PHONY: up-dependencies-only
 up-dependencies-only:
 	test -f .env || touch .env
-	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --force-recreate db redis
+	docker compose -f docker-compose.yml -f docker-compose.dev.yml up --force-recreate db redis
 
 .PHONY: run-server
 run-server:
@@ -55,13 +55,13 @@ dot-env:
 
 .PHONY: run-dockerized-build
 run-dockerized-build: build dot-env
-	docker-compose -f docker-compose.yml -f docker-compose.build.yml up --no-build --force-recreate
+	docker compose -f docker-compose.yml -f docker-compose.build.yml up --no-build --force-recreate
 
 .PHONY: run-dockerized-from-registry
 run-dockerized-from-registry: dot-env
 	echo '(username=github username; password=github personal access token (not github password)'
 	docker login ghcr.io
-	docker-compose up --no-build --force-recreate
+	docker compose up --no-build --force-recreate
 
 .PHONY: lint
 lint:
