@@ -20,8 +20,8 @@ to get the latest version for development.
                 libncursesw5-dev xz-utils libffi-dev liblzma-dev \
                 python-openssl libpq-dev
 
-#. Install Docker according to https://docs.docker.com/engine/install/
-   (known working: Docker version 20.10.1, build 831ebea)
+#. Install Docker according to https://docs.docker.com/engine/install/ubuntu/
+   (known working: Docker version 20.10.14, build a224086)
 
 #. Add your user to docker group::
 
@@ -29,7 +29,7 @@ to get the latest version for development.
     exit  # you may actually need to reboot for group membership to take effect
 
 #. Install Docker Compose according to https://docs.docker.com/compose/install/
-   (known working: docker-compose version 1.27.4, build 40524192)
+   (known working: Docker Compose version v2.4.1)
 
 #. Clone the repository::
 

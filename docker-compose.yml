@@ -33,7 +33,7 @@ services:
     image: ghcr.io/thenewboston-developers/core-reverse-proxy:latest
     restart: unless-stopped
     ports:
-      - 8000:8000
+      - 80:80
     depends_on:
       - core
 
