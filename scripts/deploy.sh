@@ -11,7 +11,7 @@ GITHUB_PASSWORD="${GITHUB_PASSWORD:-$2}"
 RUN_GENESIS="${RUN_GENESIS:-$3}"
 
 RUN_MANAGE_PY='poetry run python -m core.manage'
-DOCKER_COMPOSE_RUN_MANAGE_PY="docker-compose run --rm core $RUN_MANAGE_PY"
+DOCKER_COMPOSE_RUN_MANAGE_PY="docker compose run --rm core $RUN_MANAGE_PY"
 
 docker logout $DOCKER_REGISTRY_HOST
 
@@ -31,10 +31,10 @@ wget https://raw.githubusercontent.com/thenewboston-developers/Core/master/docke
 echo 'Creating/updating .env file...'
 grep -q -o CORESETTING_SECRET_KEY .env 2> /dev/null || echo "CORESETTING_SECRET_KEY=$$(xxd -c 48 -l 48 -p /dev/urandom)" >> .env
 
-docker-compose pull
+docker compose pull
 
 echo 'Starting the Core API...'
-docker-compose up -d --force-recreate
+docker compose up -d --force-recreate
 docker logout $DOCKER_REGISTRY_HOST
 
 echo 'Core API is up and running'
