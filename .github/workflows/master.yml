@@ -73,3 +73,39 @@ jobs:
           target: core-reverse-proxy
           tags: ghcr.io/thenewboston-developers/core-reverse-proxy:latest
           push: true
+  deploy:
+    name: Deploy to develoment environment
+    environment: production
+    needs: publish-images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure SSH
+        # TODO(dmu) MEDIUM: Once/if github implements secrets on job level
+        #                   https://github.com/actions/runner/issues/520#issuecomment-877193387
+        if: ${{ env.CONTINUOUS_DEPLOYMENT_ENABLED == 'True' }}
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$DEPLOY_SSH_KEY" > ~/.ssh/github
+          chmod 600 ~/.ssh/github
+          cat >>~/.ssh/config <<END
+          Host target
+            HostName $DEPLOY_SSH_HOST
+            User $DEPLOY_SSH_USER
+            IdentityFile ~/.ssh/github
+            LogLevel ERROR
+            StrictHostKeyChecking no
+          END
+        env:
+          CONTINUOUS_DEPLOYMENT_ENABLED: ${{ secrets.CONTINUOUS_DEPLOYMENT_ENABLED }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_SSH_HOST: ${{ secrets.DEPLOY_SSH_HOST }}
+          DEPLOY_SSH_USER: ${{ secrets.DEPLOY_SSH_USER }}
+
+      - name: Run deploy
+        # TODO(dmu) MEDIUM: Once/if github implements secrets on job level
+        #                   https://github.com/actions/runner/issues/520#issuecomment-877193387
+        if: ${{ env.CONTINUOUS_DEPLOYMENT_ENABLED == 'True' }}
+        run: |
+          ssh target "docker system prune --all --force && wget https://raw.githubusercontent.com/thenewboston-developers/Core/master/scripts/deploy.sh -O /tmp/deploy-core.sh && chmod a+x /tmp/deploy-core.sh && /tmp/deploy-core.sh ${{ github.actor }} ${{ secrets.GITHUB_TOKEN }} && rm -f /tmp/deploy-core.sh"
+        env:
+          CONTINUOUS_DEPLOYMENT_ENABLED: ${{ secrets.CONTINUOUS_DEPLOYMENT_ENABLED }}
