@@ -8,7 +8,6 @@ DOCKER_REGISTRY_HOST=ghcr.io
 #                   this script instead of using positional arguments
 GITHUB_USERNAME="${GITHUB_USERNAME:-$1}"
 GITHUB_PASSWORD="${GITHUB_PASSWORD:-$2}"
-RUN_GENESIS="${RUN_GENESIS:-$3}"
 
 RUN_MANAGE_PY='poetry run python -m core.manage'
 DOCKER_COMPOSE_RUN_MANAGE_PY="docker compose run --rm core $RUN_MANAGE_PY"
