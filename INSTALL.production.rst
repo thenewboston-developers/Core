@@ -24,4 +24,8 @@ Manual deployment
 
     bash <(wget -qO- https://raw.githubusercontent.com/thenewboston-developers/Core/master/scripts/deploy.sh)
 
+#. Create superuser::
+
+    docker compose exec -it core poetry run python -m core.manage createsuperuser
+
 This is a technical last line to serve as `end-of-file-fixer` workaround.
