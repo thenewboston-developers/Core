@@ -43,11 +43,6 @@ class BlockSerializer(ModelSerializer):
 
         return block
 
-    def update(self, instance, validated_data):
-        # TODO(dmu) HIGH: Introduce a better way of disabling block update
-        #                 https://github.com/thenewboston-developers/Core/issues/30
-        raise RuntimeError('Method unavailable')
-
     def validate(self, data):
         data = super().validate(data)
 
