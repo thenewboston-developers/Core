@@ -69,6 +69,43 @@ async def test_block_send(recipient_account_number):
 
 
 @pytest.mark.django_db
+def test_create_block_if_send_account_does_not_exist_and_amount_is_zero(
+    sender_key_pair, recipient_account_number, api_client
+):
+    assert not Block.objects.exists()
+    assert not Account.objects.exists()
+
+    payload = {
+        'sender': sender_key_pair.public,
+        'recipient': recipient_account_number,
+        'amount': 0,
+        'payload': {
+            'message': 'Hey'
+        }
+    }
+    sign_dict(payload, sender_key_pair.private)
+    with patch('core.blocks.views.block.send') as send_mock:
+        response = api_client.post('/api/blocks', payload)
+
+    assert response.status_code == 201
+    response_json = response.json()
+    assert isinstance(response_json.pop('id'), int)
+    assert response_json == payload
+    query = Block.objects.filter(sender=payload['sender'])
+    assert query.count() == 1
+    block = query.get()
+    assert block.sender == payload['sender']
+    assert block.recipient == payload['recipient']
+    assert block.amount == payload['amount']
+    assert block.payload == payload['payload']
+    assert block.signature == payload['signature']
+
+    assert not Account.objects.exists()
+
+    send_mock.assert_called_once_with(dict(payload, id=block.id))
+
+
+@pytest.mark.django_db
 def test_cannot_create_block_if_sender_account_does_not_exist(
     sender_key_pair, sender_account_number, recipient_account_number, api_client
 ):
