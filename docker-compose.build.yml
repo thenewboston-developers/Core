@@ -1,0 +1,9 @@
+version: '3.9'
+
+services:
+
+  core:
+    image: core:current
+
+  core-reverse-proxy:
+    image: core-reverse-proxy:current
