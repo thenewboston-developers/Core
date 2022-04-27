@@ -47,8 +47,23 @@ def test_update_account(sender_account, attribute, value, is_success, api_client
         assert getattr(sender_account, attribute) == original_value
 
 
-# TODO(dmu) CRITICAL: Disable PUT requests, so balance cannot be updated directly
-#                     https://github.com/thenewboston-developers/Core/issues/30
+def test_cannot_put_account(sender_account, api_client):
+    avatar = 'https://example.com/test.jpg'
+    display_name = 'New Name'
+    assert sender_account.avatar != avatar
+    assert sender_account.display_name != display_name
+    payload = {
+        'avatar': avatar,
+        'display_name': display_name,
+    }
+    response = api_client.put(f'/api/accounts/{sender_account.account_number}', payload)
+    sender_account.refresh_from_db()
+
+    assert response.status_code == 405
+    assert response.json() == {'code': 'method_not_allowed', 'message': 'Method "PUT" not allowed.'}
+
+    assert sender_account.avatar != avatar
+    assert sender_account.display_name != display_name
 
 
 @pytest.mark.django_db
