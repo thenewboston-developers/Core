@@ -49,3 +49,27 @@ jobs:
           CORESETTING_DATABASES: '{"default":{"HOST":"db"}}'
           CORESETTING_CHANNEL_LAYERS: '{"default":{"CONFIG":{"hosts":[["redis", 6379]]}}}'
 # QUALITY-ASSURANCE-END
+
+  publish-images:
+    name: Publish docker images
+    needs: quality-assurance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to GitHub Docker Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push core image to Github Packages
+        uses: docker/build-push-action@v2
+        with:
+          target: core
+          tags: ghcr.io/thenewboston-developers/core:latest
+          push: true
+      - name: Push core-reverse-proxy image to Github Packages
+        uses: docker/build-push-action@v2
+        with:
+          target: core-reverse-proxy
+          tags: ghcr.io/thenewboston-developers/core-reverse-proxy:latest
+          push: true
