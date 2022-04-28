@@ -42,6 +42,8 @@ services:
   certbot:
     image: certbot/certbot:v1.26.0
     command: certificates
+    ports:
+      - 80:80
     volumes:
       - letsencrypt:/etc/letsencrypt
 
