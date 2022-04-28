@@ -32,10 +32,12 @@ grep -q -o CORESETTING_SECRET_KEY .env 2> /dev/null || echo "CORESETTING_SECRET_
 
 docker compose pull  # Ensure latest image is downloaded locally (even if tag did not change)
 
-docker compose down
-wget https://raw.githubusercontent.com/thenewboston-developers/Core/master/docker-compose.certbot.yml -O docker-compose.certbot.yml
-docker compose -f docker-compose.certbot.yml run -it --rm certbot certificates | grep -q 'No certificates found' && (echo 'Installing certificates..'; docker compose -f docker-compose.certbot.yml run --service-ports -it --rm certbot certonly --agree-tos --email dmugtasimov@gmail.com --non-interactive --domain thenewboston.network --standalone) || echo 'Certificates already installed'
-rm -f docker-compose.certbot.yml
+if docker compose run -it --rm certbot -c 'certbot certificates' | grep -q 'No certificates found'; then
+  echo 'Installing certificates...'
+  docker compose down
+  wget https://raw.githubusercontent.com/thenewboston-developers/Core/master/docker-compose.certbot.yml -O docker-compose.certbot.yml
+  docker compose -f docker-compose.yml -f docker-compose.certbot.yml run -it --rm --service-ports certbot -c 'certbot certonly --agree-tos --email dmugtasimov@gmail.com --non-interactive --domain thenewboston.network --standalone'
+  rm -f docker-compose.certbot.yml
 
 echo 'Starting the Core API...'
 docker compose up -d --force-recreate
