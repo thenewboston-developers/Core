@@ -32,6 +32,8 @@ grep -q -o CORESETTING_SECRET_KEY .env 2> /dev/null || echo "CORESETTING_SECRET_
 
 docker compose pull  # Ensure latest image is downloaded locally (even if tag did not change)
 
+docker compose run -it --rm certbot certificates | grep -q 'No certificates found' && (echo 'Installing certificates..'; docker compose run -it --rm certbot certonly --non-interactive --domain thenewboston.network --standalone)
+
 echo 'Starting the Core API...'
 docker compose up -d --force-recreate
 docker logout $DOCKER_REGISTRY_HOST
