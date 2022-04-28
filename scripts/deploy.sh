@@ -38,6 +38,7 @@ if docker compose run -it --rm certbot -c 'certbot certificates' | grep -q 'No c
   wget https://raw.githubusercontent.com/thenewboston-developers/Core/master/docker-compose.certbot.yml -O docker-compose.certbot.yml
   docker compose -f docker-compose.yml -f docker-compose.certbot.yml run -it --rm --service-ports certbot -c 'certbot certonly --agree-tos --email dmugtasimov@gmail.com --non-interactive --domain thenewboston.network --standalone'
   rm -f docker-compose.certbot.yml
+fi
 
 echo 'Starting the Core API...'
 docker compose up -d --force-recreate
