@@ -36,9 +36,19 @@ services:
       - 80:80
     depends_on:
       - core
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+
+  certbot:
+    image: certbot/certbot:v1.26.0
+    command: certificates
+    volumes:
+      - letsencrypt:/etc/letsencrypt
 
 volumes:
   postgresql-data:
     driver: local
   redis-data:
+    driver: local
+  letsencrypt:
     driver: local
