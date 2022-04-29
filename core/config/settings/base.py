@@ -3,6 +3,7 @@ DEBUG = False
 
 # TODO(dmu) MEDIUM: Consider a more secure value for `ALLOWED_HOSTS`
 ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = ['https://thenewboston.network']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
