@@ -27,7 +27,7 @@ class Config(CustomModel):
         )
 
     def save(self, *args, **kwargs):
-        if Config.objects.count():
+        if self.id is None and Config.objects.count():
             raise ValidationError('Only one config instance is allowed')
 
         return super().save(*args, **kwargs)
