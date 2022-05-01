@@ -34,9 +34,9 @@ class AccountSerializer(ValidateFieldsMixin, serializers.ModelSerializer):
         if not signature:
             # The signature is required even for partial updates (PATCH-requests) therefore we have to validate
             # it explicitly here
-            raise ValidationError({'signature': 'This field is required.'})
+            raise ValidationError({'signature': ['This field is required.']})
 
         if not is_dict_signature_valid(attrs, self.instance.account_number, signature):
-            raise ValidationError({'signature': ['Invalid']})
+            raise ValidationError({'signature': ['Invalid.']})
 
         return attrs
