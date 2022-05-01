@@ -14,6 +14,7 @@ class Block(CustomModel):
         max_length=ACCOUNT_NUMBER_LENGTH, validators=(HexStringValidator(ACCOUNT_NUMBER_LENGTH),)
     )
     amount = models.PositiveBigIntegerField()
+    transaction_fee = models.PositiveBigIntegerField()
     payload = models.JSONField(null=True)
 
     def __str__(self):
