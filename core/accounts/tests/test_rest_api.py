@@ -61,7 +61,7 @@ def test_cannot_update_account_with_invalid_signature(sender_account, api_client
     response = api_client.patch(f'/api/accounts/{sender_account.account_number}', payload)
 
     assert response.status_code == 400
-    assert response.json() == {'signature': [{'code': 'invalid', 'message': 'Invalid'}]}
+    assert response.json() == {'signature': [{'code': 'invalid', 'message': 'Invalid.'}]}
     sender_account.refresh_from_db()
     assert sender_account.avatar == original_value
 
