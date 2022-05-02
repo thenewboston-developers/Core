@@ -4,6 +4,7 @@ from rest_framework.serializers import ModelSerializer
 from core.accounts.models.account import Account
 from core.core.serializers import ValidateFieldsMixin
 from core.core.utils.cryptography import is_dict_signature_valid
+from core.settings.models import get_value
 
 from ..models.block import Block
 
@@ -21,18 +22,33 @@ class BlockSerializer(ValidateFieldsMixin, ModelSerializer):
 
         amount = block.amount
         assert amount >= 0
-        if amount == 0:  # no need to update balances or create recipient account if there is no coin transfer
-            return block
+
+        transaction_fee = get_value('transaction_fee')
+        assert transaction_fee > 0
+
+        total_amount = amount + transaction_fee
+        assert total_amount > 0
 
         # It is crucial to make select_for_update()
         sender_account = Account.objects.select_for_update().get_or_none(account_number=block.sender)
 
         # Just assert here, because it must have been validated in validate()
         assert sender_account
-        assert sender_account.balance >= amount
+        sender_account.balance -= total_amount
+        assert sender_account.balance >= 0
 
-        sender_account.balance -= amount
         sender_account.save()
+
+        fee_account_number = get_value('owner')
+        fee_account, is_created = Account.objects.select_for_update().get_or_create(
+            account_number=fee_account_number, defaults={'balance': transaction_fee}
+        )
+        if not is_created:
+            fee_account.balance += transaction_fee
+            fee_account.save()
+
+        if amount == 0:  # no need to update balances or create recipient account if there is no coin transfer
+            return block
 
         recipient_account, is_created = Account.objects.select_for_update().get_or_create(
             account_number=block.recipient, defaults={'balance': amount}
@@ -55,16 +71,23 @@ class BlockSerializer(ValidateFieldsMixin, ModelSerializer):
             raise ValidationError({'signature': ['Invalid']})
 
         amount = attrs['amount']
-        assert amount >= 0
-        if amount == 0:  # no need for remaining validations since we are not sending coins
-            return attrs
+        total_amount = amount + get_value('transaction_fee')
+        assert total_amount > 0
 
         # It is crucial to make select_for_update(), so we get database row lock till the moment of actual update
         sender_account = Account.objects.select_for_update().get_or_none(account_number=sender)
         if sender_account is None:
             raise ValidationError({'sender': ['Sender account does not exist']})
 
-        if sender_account.balance < attrs['amount']:
-            raise ValidationError({'amount': ['Amount is greater than sender account balance']})
+        if sender_account.balance < total_amount:
+            raise ValidationError({'amount': ['Total amount is greater than sender account balance']})
 
         return attrs
+
+    @staticmethod
+    def validate_transaction_fee(value):
+        min_transaction_fee = get_value('transaction_fee')
+        if value < min_transaction_fee:
+            raise ValidationError('Too small amount')
+
+        return value

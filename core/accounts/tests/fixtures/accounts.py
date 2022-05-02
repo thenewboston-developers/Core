@@ -2,6 +2,7 @@ import pytest
 from model_bakery import baker
 
 from core.core.utils.cryptography import KeyPair
+from core.settings.models import Config
 
 
 @pytest.fixture
@@ -31,10 +32,39 @@ def recipient_account_number(recipient_key_pair):
 
 
 @pytest.fixture
+def owner_key_pair():
+    return KeyPair(
+        public='8d215ae8c153ad90cbe089117190e98cc608ddea956f2b3485ab1cb899ea7329',
+        private='c1b1195bee12379d96798fc0e498c5b97e6026cc2011ecc9d788470e32c63b42'
+    )
+
+
+@pytest.fixture
+def owner_account_number(owner_key_pair):
+    return owner_key_pair.public
+
+
+@pytest.fixture
 def sender_account(sender_account_number, db):
     return baker.make('accounts.Account', account_number=sender_account_number, balance=20000)
 
 
 @pytest.fixture
-def recipient_account(sender_account_number, db):
-    return baker.make('accounts.Account', account_number=sender_account_number, balance=30000)
+def recipient_account(recipient_account_number, db):
+    return baker.make('accounts.Account', account_number=recipient_account_number, balance=30000)
+
+
+@pytest.fixture
+def owner_account(owner_account_number, db):
+    return baker.make('accounts.Account', account_number=owner_account_number, balance=50000)
+
+
+@pytest.fixture
+def owner_account_setting(owner_account_number, db):
+    config = Config.objects.get()
+    original_value = config.owner
+    config.owner = owner_account_number
+    config.save()
+    yield
+    config.owner = original_value
+    config.save()

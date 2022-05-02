@@ -45,7 +45,7 @@ class ConfigSerializer(ValidateFieldsMixin, serializers.ModelSerializer):
             # it explicitly hereF
             raise ValidationError({'signature': ['This field is required.']})
 
-        account_number = attrs.get('account_number', None)
+        account_number = attrs.get('account_number')
         if not account_number:
             # The account_number is required even for partial updates (PATCH-requests) therefore we have to validate
             # it explicitly here
