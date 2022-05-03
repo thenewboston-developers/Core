@@ -1,5 +1,5 @@
 import json
-from typing import NamedTuple, Optional
+from typing import NamedTuple
 
 from nacl.exceptions import CryptoError
 from nacl.signing import SigningKey as NaClSigningKey
@@ -41,11 +41,8 @@ def generate_key_pair() -> KeyPair:
     return KeyPair(bytes_to_hex(signing_key.verify_key), bytes_to_hex(bytes(signing_key)))
 
 
-def is_dict_signature_valid(dict_: dict, verify_key: str, signature: Optional[str] = None) -> bool:
+def is_dict_signature_valid(dict_: dict, verify_key: str, signature: str) -> bool:
     dict_ = dict_.copy()
-    if not (signature := signature or dict_.pop('signature', None)):
-        return False
-
     message = normalize_dict(dict_)
     return is_signature_valid(message, verify_key, signature)
 
