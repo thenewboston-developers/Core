@@ -39,14 +39,6 @@ class BlockSerializer(ValidateFieldsMixin, ModelSerializer):
 
         sender_account.save()
 
-        fee_account_number = get_value('owner')
-        fee_account, is_created = Account.objects.select_for_update().get_or_create(
-            account_number=fee_account_number, defaults={'balance': transaction_fee}
-        )
-        if not is_created:
-            fee_account.balance += transaction_fee
-            fee_account.save()
-
         if amount == 0:  # no need to update balances or create recipient account if there is no coin transfer
             return block
 
