@@ -63,8 +63,12 @@ def test_create_block(
     recipient_account = Account.objects.get(account_number=recipient_account_number)
     assert recipient_account.balance == recipient_initial_balance + 5
 
-    owner_account = Account.objects.get(account_number=owner_account_number)
-    assert owner_account.balance == owner_initial_balance + 1
+    owner_account = Account.objects.get_or_none(account_number=owner_account_number)
+    if do_accounts_exist:
+        assert owner_account
+        assert owner_account.balance == owner_initial_balance
+    else:
+        assert not owner_account
 
     send_mock.assert_called_once_with(dict(payload, id=block.id))
 
@@ -88,6 +92,8 @@ def test_create_block_if_owner_account_is_not_configured(
     sender_key_pair, sender_account, recipient_account, api_client
 ):
     assert not Block.objects.exists()
+    config = Config.objects.get()
+    assert config.owner is None
 
     sender_initial_balance = sender_account.balance
     recipient_initial_balance = recipient_account.balance
@@ -123,6 +129,9 @@ def test_create_block_if_owner_account_is_not_configured(
 
     recipient_account.refresh_from_db()
     assert recipient_account.balance == recipient_initial_balance + 5
+
+    assert not Account.objects.filter(account_number__isnull=True).exists()
+    assert not Account.objects.filter(account_number='').exists()
 
     send_mock.assert_called_once_with(dict(payload, id=block.id))
 
