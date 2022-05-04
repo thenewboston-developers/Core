@@ -3,6 +3,7 @@ DEBUG = False
 
 # TODO(dmu) MEDIUM: Consider a more secure value for `ALLOWED_HOSTS`
 ALLOWED_HOSTS = ['*']
+CORS_ALLOW_ALL_ORIGINS = True
 CSRF_TRUSTED_ORIGINS = ['https://thenewboston.network']
 
 INSTALLED_APPS = [
@@ -17,6 +18,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'channels',
+    'corsheaders',
 
     # Apps
     'core.accounts.apps.AccountsConfig',
@@ -25,6 +27,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
