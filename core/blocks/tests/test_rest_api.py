@@ -136,6 +136,38 @@ def test_create_block_if_owner_account_is_not_configured(
     send_mock.assert_called_once_with(dict(payload, id=block.id))
 
 
+@pytest.mark.parametrize(
+    'inner_payload', ({
+        'message': 'Hey'
+    }, 'a simple string', 'YmFzZTY0c3RyaW5n', 12, [5, 'a string'])
+)
+def test_can_store_types_as_payload(sender_key_pair, sender_account, recipient_account, inner_payload, api_client):
+    assert not Block.objects.exists()
+
+    payload = {
+        'sender': sender_account.account_number,
+        'recipient': recipient_account.account_number,
+        'amount': 5,
+        'transaction_fee': 1,
+        'payload': inner_payload
+    }
+    sign_dict(payload, sender_key_pair.private)
+    response = api_client.post('/api/blocks', payload)
+
+    assert response.status_code == 201
+    response_json = response.json()
+    assert isinstance(response_json.pop('id'), int)
+    assert response_json == payload
+    query = Block.objects.filter(sender=payload['sender'])
+    assert query.count() == 1
+    block = query.get()
+    assert block.sender == payload['sender']
+    assert block.recipient == payload['recipient']
+    assert block.amount == payload['amount']
+    assert block.payload == payload['payload']
+    assert block.signature == payload['signature']
+
+
 @pytest.mark.django_db
 def test_cannot_create_block_if_send_account_does_not_exist_and_amount_is_zero(
     sender_key_pair, recipient_account_number, api_client
