@@ -16,25 +16,28 @@ POST https://thenewboston.network/api/blocks
 Request::
 
     {
-      "sender": "eb01f474a637e402b44407f3c1044a0c4b59261515d50be9abd4ee34fcb9075b",
-      "recipient": "6fac7f7e2b90173bfc6ef8ee34f9c92438b5eb8f579ef8d84464b820bbfecfc1",
-      "amount": 0,
+      "amount": 5,
       "payload": {
         "message": "Hey"
       },
-      "signature": "df64c0689b2f203c345269aea47d90576c6c37ce168d6084016772f79b2dfb1228de053ec753a2b87e4b404929a8bc6123acf56e7acd178716077e4ddb9b3208"
+      "recipient": "995bd2a4db610062f404510617e83126fa37e2836805975f334108b55523634c",
+      "sender": "73b3c1c2f1cc307969060ab84a0e34937c6442913e4774ec8f3e2b4fe1926cf8",
+      "transaction_fee": 1,
+      "signature": "d20e3b4ea06e9fe1ac190928e2bd5b27ec6ec1ba2c05eb303da44428b8d6d03684ef0965acdda361d5c2913712c07b52b3c96ff106754e750d64625330bc7d04"
     }
 
 Response::
 
     {
-      "sender": "eb01f474a637e402b44407f3c1044a0c4b59261515d50be9abd4ee34fcb9075b",
-      "recipient": "6fac7f7e2b90173bfc6ef8ee34f9c92438b5eb8f579ef8d84464b820bbfecfc1",
-      "amount": 0,
+      "id": 42,
+      "sender": "73b3c1c2f1cc307969060ab84a0e34937c6442913e4774ec8f3e2b4fe1926cf8",
+      "signature": "d20e3b4ea06e9fe1ac190928e2bd5b27ec6ec1ba2c05eb303da44428b8d6d03684ef0965acdda361d5c2913712c07b52b3c96ff106754e750d64625330bc7d04",
+      "recipient": "995bd2a4db610062f404510617e83126fa37e2836805975f334108b55523634c",
+      "amount": 5,
+      "transaction_fee": 1,
       "payload": {
         "message": "Hey"
-      },
-      "signature": "df64c0689b2f203c345269aea47d90576c6c37ce168d6084016772f79b2dfb1228de053ec753a2b87e4b404929a8bc6123acf56e7acd178716077e4ddb9b3208"
+      }
     }
 
 wss://thenewboston.network/ws/blocks/{ACCOUNT_NUMBER}
