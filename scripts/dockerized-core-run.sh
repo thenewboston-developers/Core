@@ -13,4 +13,4 @@ echo 'Running migrations...'
 $RUN_MANAGE_PY migrate --no-input
 
 echo 'Starting the Core API...'
-poetry run daphne -b 0.0.0.0 -p 8000 core.config.asgi:application
+poetry run daphne -b 0.0.0.0 -p 8000 core.project.asgi:application
