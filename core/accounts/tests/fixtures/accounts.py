@@ -1,8 +1,8 @@
 import pytest
 from model_bakery import baker
 
+from core.config.models import Config
 from core.core.utils.cryptography import KeyPair
-from core.settings.models import Config
 
 
 @pytest.fixture

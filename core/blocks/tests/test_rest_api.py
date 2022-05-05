@@ -8,9 +8,9 @@ from model_bakery import baker
 from core.accounts.models import Account
 from core.blocks.models import Block
 from core.blocks.views.block import send as block_send
+from core.config.models import Config
 from core.core.utils.cryptography import sign_dict
 from core.project.asgi import application
-from core.settings.models import Config
 
 
 @pytest.mark.parametrize('do_accounts_exist', (False, True))

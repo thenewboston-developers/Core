@@ -1,7 +1,7 @@
 import pytest
 
+from core.config.models import Config
 from core.core.utils.cryptography import sign_dict
-from core.settings.models import Config
 
 
 @pytest.mark.django_db

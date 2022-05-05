@@ -23,7 +23,7 @@ INSTALLED_APPS = [
     # Apps
     'core.accounts.apps.AccountsConfig',
     'core.blocks.apps.BlocksConfig',
-    'core.settings.apps.SettingsConfig',
+    'core.config.apps.SettingsConfig',
 ]
 
 MIDDLEWARE = [
