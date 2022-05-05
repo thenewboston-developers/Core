@@ -33,4 +33,4 @@ RUN chmod a+x run.sh
 FROM nginx:1.21.6-alpine AS core-reverse-proxy
 
 RUN rm /etc/nginx/conf.d/default.conf
-COPY ./core/config/settings/templates/nginx.conf /etc/nginx/conf.d/core.conf
+COPY core/project/settings/templates/nginx.conf /etc/nginx/conf.d/core.conf
