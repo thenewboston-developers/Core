@@ -7,7 +7,7 @@ import core.core.validators
 
 
 def create_config(apps, schema_editor):
-    Config = apps.get_model('settings', 'Config')
+    Config = apps.get_model('config', 'Config')
     Config.objects.get_or_create()
 
 

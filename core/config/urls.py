@@ -1,15 +1,8 @@
-from django.contrib import admin
-from django.urls import include, path
+from rest_framework.routers import SimpleRouter
 
-import core.accounts.urls
-import core.blocks.urls
-import core.settings.urls
+from .views import ConfigViewSet
 
-API_PREFIX = 'api/'
+router = SimpleRouter(trailing_slash=False)
+router.register('config', ConfigViewSet)
 
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path(API_PREFIX, include(core.accounts.urls)),
-    path(API_PREFIX, include(core.blocks.urls)),
-    path(API_PREFIX, include(core.settings.urls)),
-]
+urlpatterns = router.urls

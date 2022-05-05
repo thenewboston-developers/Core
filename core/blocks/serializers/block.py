@@ -2,9 +2,9 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import ModelSerializer
 
 from core.accounts.models.account import Account
+from core.config.models import get_value
 from core.core.serializers import ValidateFieldsMixin
 from core.core.utils.cryptography import is_dict_signature_valid
-from core.settings.models import get_value
 
 from ..models.block import Block
 

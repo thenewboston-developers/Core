@@ -23,7 +23,7 @@ INSTALLED_APPS = [
     # Apps
     'core.accounts.apps.AccountsConfig',
     'core.blocks.apps.BlocksConfig',
-    'core.settings.apps.SettingsConfig',
+    'core.config.apps.SettingsConfig',
 ]
 
 MIDDLEWARE = [
@@ -37,7 +37,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'core.config.urls'
+ROOT_URLCONF = 'core.project.urls'
 
 TEMPLATES = [
     {

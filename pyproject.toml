@@ -41,7 +41,7 @@ column_limit = 119
 dedent_closing_brackets = true
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "core.config.settings"
+DJANGO_SETTINGS_MODULE = "core.project.settings"
 django_find_project = false
 python_files = "test_*.py"
 testpaths = ["core"]

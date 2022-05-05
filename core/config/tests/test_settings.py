@@ -1,7 +1,7 @@
 import pytest
 from django.core.exceptions import ValidationError
 
-from core.settings.models import Config, get_value
+from core.config.models import Config, get_value
 
 
 @pytest.mark.django_db

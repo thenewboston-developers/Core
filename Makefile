@@ -19,11 +19,11 @@ install:
 
 .PHONY: migrations
 migrations:
-	 poetry run python -m core.manage makemigrations
+	poetry run python -m core.manage makemigrations
 
 .PHONY: migrate
 migrate:
-	 poetry run python -m core.manage migrate
+	poetry run python -m core.manage migrate
 
 .PHONY: install-pre-commit
 install-pre-commit:

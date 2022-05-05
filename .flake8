@@ -12,5 +12,5 @@ max-linenumber = 500
 max-line-length = 119
 multiline-quotes = double
 per-file-ignores =
-    core/config/settings/templates/settings.dev.py:F821
-    core/config/settings/templates/settings.unittests.py:F821
+    core/project/settings/templates/settings.dev.py:F821
+    core/project/settings/templates/settings.unittests.py:F821
