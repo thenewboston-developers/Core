@@ -6,6 +6,7 @@ from core.core.validators import HexStringValidator
 
 
 class Block(CustomModel):
+    id = models.UUIDField(primary_key=True)  # noqa: A003
     sender = models.CharField(
         max_length=ACCOUNT_NUMBER_LENGTH, validators=(HexStringValidator(ACCOUNT_NUMBER_LENGTH),)
     )

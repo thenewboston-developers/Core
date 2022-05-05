@@ -1,4 +1,5 @@
 from unittest.mock import patch
+from uuid import UUID
 
 import pytest
 from asgiref.sync import sync_to_async
@@ -32,6 +33,7 @@ def test_create_block(
         owner_initial_balance = 0
 
     payload = {
+        'id': 'dc348eac-fc89-4b4e-96de-4a988e0b94e1',
         'sender': sender_account.account_number,
         'recipient': recipient_account_number,
         'amount': 5,
@@ -46,11 +48,12 @@ def test_create_block(
 
     assert response.status_code == 201
     response_json = response.json()
-    assert isinstance(response_json.pop('id'), int)
     assert response_json == payload
+
     query = Block.objects.filter(sender=payload['sender'])
     assert query.count() == 1
     block = query.get()
+    assert block.id == UUID(payload['id'])
     assert block.sender == payload['sender']
     assert block.recipient == payload['recipient']
     assert block.amount == payload['amount']
@@ -70,7 +73,67 @@ def test_create_block(
     else:
         assert not owner_account
 
-    send_mock.assert_called_once_with(dict(payload, id=block.id))
+    send_mock.assert_called_once_with(payload)
+
+
+@pytest.mark.usefixtures('owner_account_setting')
+def test_cannot_do_replay_attack(sender_key_pair, sender_account, recipient_account, api_client):
+    assert not Block.objects.exists()
+
+    sender_initial_balance = sender_account.balance
+    recipient_initial_balance = recipient_account.balance
+
+    payload = {
+        'id': 'dc348eac-fc89-4b4e-96de-4a988e0b94e1',
+        'sender': sender_account.account_number,
+        'recipient': recipient_account.account_number,
+        'amount': 5,
+        'transaction_fee': 1,
+        'payload': {
+            'message': 'Hey'
+        }
+    }
+    sign_dict(payload, sender_key_pair.private)
+    with patch('core.blocks.views.block.send') as send_mock:
+        response = api_client.post('/api/blocks', payload)
+
+    assert response.status_code == 201
+    response_json = response.json()
+    assert response_json == payload
+
+    query = Block.objects.filter(sender=payload['sender'])
+    assert query.count() == 1
+    block = query.get()
+    assert block.id == UUID(payload['id'])
+    assert block.sender == payload['sender']
+    assert block.recipient == payload['recipient']
+    assert block.amount == payload['amount']
+    assert block.payload == payload['payload']
+    assert block.signature == payload['signature']
+
+    sender_account.refresh_from_db()
+    assert sender_account.balance == sender_initial_balance - 5 - 1
+
+    recipient_account.refresh_from_db()
+    assert recipient_account.balance == recipient_initial_balance + 5
+
+    send_mock.assert_called_once_with(payload)
+
+    with patch('core.blocks.views.block.send') as send_mock:
+        response = api_client.post('/api/blocks', payload)
+
+    assert response.status_code == 400
+    assert response.json() == {'id': [{'code': 'unique', 'message': 'block with this id already exists.'}]}
+    send_mock.assert_not_called()
+
+    query = Block.objects.filter(sender=payload['sender'])
+    assert query.count() == 1
+
+    sender_account.refresh_from_db()
+    assert sender_account.balance == sender_initial_balance - 5 - 1  # no change from previous block
+
+    recipient_account.refresh_from_db()
+    assert recipient_account.balance == recipient_initial_balance + 5  # no change from previous block
 
 
 @pytest.mark.asyncio
@@ -99,6 +162,7 @@ def test_create_block_if_owner_account_is_not_configured(
     recipient_initial_balance = recipient_account.balance
 
     payload = {
+        'id': 'dc348eac-fc89-4b4e-96de-4a988e0b94e1',
         'sender': sender_account.account_number,
         'recipient': recipient_account.account_number,
         'amount': 5,
@@ -113,11 +177,12 @@ def test_create_block_if_owner_account_is_not_configured(
 
     assert response.status_code == 201
     response_json = response.json()
-    assert isinstance(response_json.pop('id'), int)
     assert response_json == payload
+
     query = Block.objects.filter(sender=payload['sender'])
     assert query.count() == 1
     block = query.get()
+    assert block.id == UUID(payload['id'])
     assert block.sender == payload['sender']
     assert block.recipient == payload['recipient']
     assert block.amount == payload['amount']
@@ -133,7 +198,7 @@ def test_create_block_if_owner_account_is_not_configured(
     assert not Account.objects.filter(account_number__isnull=True).exists()
     assert not Account.objects.filter(account_number='').exists()
 
-    send_mock.assert_called_once_with(dict(payload, id=block.id))
+    send_mock.assert_called_once_with(payload)
 
 
 @pytest.mark.parametrize(
@@ -145,6 +210,7 @@ def test_can_store_types_as_payload(sender_key_pair, sender_account, recipient_a
     assert not Block.objects.exists()
 
     payload = {
+        'id': 'dc348eac-fc89-4b4e-96de-4a988e0b94e1',
         'sender': sender_account.account_number,
         'recipient': recipient_account.account_number,
         'amount': 5,
@@ -156,16 +222,12 @@ def test_can_store_types_as_payload(sender_key_pair, sender_account, recipient_a
 
     assert response.status_code == 201
     response_json = response.json()
-    assert isinstance(response_json.pop('id'), int)
     assert response_json == payload
+
     query = Block.objects.filter(sender=payload['sender'])
     assert query.count() == 1
     block = query.get()
-    assert block.sender == payload['sender']
-    assert block.recipient == payload['recipient']
-    assert block.amount == payload['amount']
     assert block.payload == payload['payload']
-    assert block.signature == payload['signature']
 
 
 @pytest.mark.django_db
@@ -176,6 +238,7 @@ def test_cannot_create_block_if_send_account_does_not_exist_and_amount_is_zero(
     assert not Account.objects.exists()
 
     payload = {
+        'id': 'dc348eac-fc89-4b4e-96de-4a988e0b94e1',
         'sender': sender_key_pair.public,
         'recipient': recipient_account_number,
         'amount': 0,
@@ -200,6 +263,7 @@ def test_cannot_create_block_if_transaction_fee_is_too_small(
     config.save()
 
     payload = {
+        'id': 'dc348eac-fc89-4b4e-96de-4a988e0b94e1',
         'sender': sender_account.account_number,
         'recipient': recipient_account_number,
         'amount': 5,
@@ -221,6 +285,7 @@ def test_cannot_create_block_if_sender_account_does_not_exist(
     assert not Account.objects.filter(account_number=sender_account_number).exists()
 
     payload = {
+        'id': 'dc348eac-fc89-4b4e-96de-4a988e0b94e1',
         'sender': sender_account_number,
         'recipient': recipient_account_number,
         'amount': 5,
@@ -239,6 +304,7 @@ def test_cannot_create_block_if_sender_balance_is_not_enough(
     sender_key_pair, sender_account, recipient_account_number, api_client
 ):
     payload = {
+        'id': 'dc348eac-fc89-4b4e-96de-4a988e0b94e1',
         'sender': sender_account.account_number,
         'recipient': recipient_account_number,
         'amount': sender_account.balance,
@@ -261,6 +327,7 @@ def test_cannot_create_block_if_sender_balance_is_not_enough(
 @pytest.mark.django_db
 def test_cannot_create_block_if_sender_and_recipient_are_the_same(sender_key_pair, sender_account, api_client):
     payload = {
+        'id': 'dc348eac-fc89-4b4e-96de-4a988e0b94e1',
         'sender': sender_account.account_number,
         'recipient': sender_account.account_number,
         'amount': 5,
@@ -283,6 +350,7 @@ def test_cannot_create_block_if_sender_and_recipient_are_the_same(sender_key_pai
 @pytest.mark.django_db
 def test_cannot_create_block_if_amount_is_none(sender_key_pair, sender_account, recipient_account_number, api_client):
     payload = {
+        'id': 'dc348eac-fc89-4b4e-96de-4a988e0b94e1',
         'sender': sender_account.account_number,
         'recipient': recipient_account_number,
         'amount': None,
@@ -302,6 +370,7 @@ def test_cannot_create_block_if_amount_is_negative(
     sender_key_pair, sender_account, recipient_account_number, api_client
 ):
     payload = {
+        'id': 'dc348eac-fc89-4b4e-96de-4a988e0b94e1',
         'sender': sender_account.account_number,
         'recipient': recipient_account_number,
         'amount': -1,
@@ -326,6 +395,7 @@ def test_create_block_if_amount_is_zero(sender_key_pair, sender_account, recipie
     assert not Account.objects.filter(account_number=recipient_account_number).exists()
 
     payload = {
+        'id': 'dc348eac-fc89-4b4e-96de-4a988e0b94e1',
         'sender': sender_account.account_number,
         'recipient': recipient_account_number,
         'amount': 0,
@@ -340,11 +410,12 @@ def test_create_block_if_amount_is_zero(sender_key_pair, sender_account, recipie
 
     assert response.status_code == 201
     response_json = response.json()
-    assert isinstance(response_json.pop('id'), int)
+
     assert response_json == payload
     query = Block.objects.filter(sender=payload['sender'])
     assert query.count() == 1
     block = query.get()
+    assert block.id == UUID(payload['id'])
     assert block.sender == payload['sender']
     assert block.recipient == payload['recipient']
     assert block.amount == payload['amount']
@@ -352,7 +423,7 @@ def test_create_block_if_amount_is_zero(sender_key_pair, sender_account, recipie
     assert block.signature == payload['signature']
 
     assert not Account.objects.filter(account_number=recipient_account_number).exists()
-    send_mock.assert_called_once_with(dict(payload, id=block.id))
+    send_mock.assert_called_once_with(payload)
 
 
 def test_cannot_create_block_with_invalid_signature(
@@ -362,6 +433,7 @@ def test_cannot_create_block_with_invalid_signature(
     assert not Account.objects.filter(account_number=recipient_account_number).exists()
 
     payload = {
+        'id': 'dc348eac-fc89-4b4e-96de-4a988e0b94e1',
         'sender': sender_account.account_number,
         'recipient': recipient_account_number,
         'amount': 5,
@@ -388,6 +460,7 @@ def test_cannot_create_block_without_signature(sender_key_pair, sender_account, 
     assert not Account.objects.filter(account_number=recipient_account_number).exists()
 
     payload = {
+        'id': 'dc348eac-fc89-4b4e-96de-4a988e0b94e1',
         'sender': sender_account.account_number,
         'recipient': recipient_account_number,
         'amount': 5,
@@ -418,6 +491,7 @@ def test_cannot_update_block(sender_key_pair, sender_account, recipient_account_
     assert block.recipient == '1' * 64
 
     payload = {
+        'id': 'dc348eac-fc89-4b4e-96de-4a988e0b94e1',
         'sender': sender_account.account_number,
         'recipient': '2' * 64,
         'amount': 5,
@@ -443,9 +517,9 @@ def test_list_blocks(api_client):
     block3 = baker.make('blocks.Block')
     response = api_client.get('/api/blocks')
     assert response.status_code == 200
-    assert response.json() == [
+    blocks = [
         {
-            'id': block1.id,
+            'id': str(block1.id),
             'sender': block1.sender,
             'recipient': block1.recipient,
             'amount': block1.amount,
@@ -454,7 +528,7 @@ def test_list_blocks(api_client):
             'signature': block1.signature,
         },
         {
-            'id': block2.id,
+            'id': str(block2.id),
             'sender': block2.sender,
             'recipient': block2.recipient,
             'amount': block2.amount,
@@ -463,7 +537,7 @@ def test_list_blocks(api_client):
             'signature': block2.signature,
         },
         {
-            'id': block3.id,
+            'id': str(block3.id),
             'sender': block3.sender,
             'recipient': block3.recipient,
             'amount': block3.amount,
@@ -472,3 +546,4 @@ def test_list_blocks(api_client):
             'signature': block3.signature,
         },
     ]
+    assert response.json() == sorted(blocks, key=lambda x: x['id'])
