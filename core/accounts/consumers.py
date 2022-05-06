@@ -2,7 +2,7 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
 
 
-class BlockConsumer(JsonWebsocketConsumer):
+class AccountConsumer(JsonWebsocketConsumer):
 
     def connect(self):
         """Accepts an incoming socket"""
