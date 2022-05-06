@@ -41,7 +41,7 @@ Response::
       }
     }
 
-wss://thenewboston.network/ws/blocks/{ACCOUNT_NUMBER}
+wss://thenewboston.network/ws/accounts/{ACCOUNT_NUMBER}
 -----------------------------------------------------
 
 Connect to receive any incoming messages sent to the **ACCOUNT_NUMBER**.

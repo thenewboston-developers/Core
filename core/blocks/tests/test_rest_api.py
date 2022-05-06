@@ -138,7 +138,7 @@ def test_cannot_do_replay_attack(sender_key_pair, sender_account, recipient_acco
 
 @pytest.mark.asyncio
 async def test_block_send(recipient_account_number):
-    communicator = WebsocketCommunicator(application, f'ws/blocks/{recipient_account_number}')
+    communicator = WebsocketCommunicator(application, f'ws/accounts/{recipient_account_number}')
     connected, _ = await communicator.connect()
     assert connected
 
