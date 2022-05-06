@@ -1,6 +1,7 @@
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
 
 from core.accounts.consumers import MessageType, send
+from core.core.utils.misc import apply_on_commit
 from core.core.views import CustomGenericViewSet
 
 from ..models.block import Block
@@ -13,6 +14,6 @@ class BlockViewSet(CreateModelMixin, ListModelMixin, CustomGenericViewSet):
 
     def perform_create(self, serializer):
         rv = super().perform_create(serializer)
-        message = serializer.data
-        send(MessageType.CREATE_BLOCK, message['recipient'], message)
+        # We assign `serializer.data` to `message` kwarg to avoid to avoid closure creation (please, keep it)
+        apply_on_commit(lambda message=serializer.data: send(MessageType.CREATE_BLOCK, message['recipient'], message))
         return rv
