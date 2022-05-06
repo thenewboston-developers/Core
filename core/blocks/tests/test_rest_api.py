@@ -6,9 +6,9 @@ from asgiref.sync import sync_to_async
 from channels.testing import WebsocketCommunicator
 from model_bakery import baker
 
+from core.accounts.consumers import MessageType, send
 from core.accounts.models import Account
 from core.blocks.models import Block
-from core.blocks.views.block import send as block_send
 from core.config.models import Config
 from core.core.utils.cryptography import sign_dict
 from core.project.asgi import application
@@ -73,7 +73,7 @@ def test_create_block(
     else:
         assert not owner_account
 
-    send_mock.assert_called_once_with(payload)
+    send_mock.assert_called_once_with(MessageType.CREATE_BLOCK, payload['recipient'], payload)
 
 
 @pytest.mark.usefixtures('owner_account_setting')
@@ -117,7 +117,7 @@ def test_cannot_do_replay_attack(sender_key_pair, sender_account, recipient_acco
     recipient_account.refresh_from_db()
     assert recipient_account.balance == recipient_initial_balance + 5
 
-    send_mock.assert_called_once_with(payload)
+    send_mock.assert_called_once_with(MessageType.CREATE_BLOCK, payload['recipient'], payload)
 
     with patch('core.blocks.views.block.send') as send_mock:
         response = api_client.post('/api/blocks', payload)
@@ -137,16 +137,27 @@ def test_cannot_do_replay_attack(sender_key_pair, sender_account, recipient_acco
 
 
 @pytest.mark.asyncio
-async def test_block_send(recipient_account_number):
+async def test_block_send(sender_account_number, recipient_account_number):
     communicator = WebsocketCommunicator(application, f'ws/accounts/{recipient_account_number}')
     connected, _ = await communicator.connect()
     assert connected
 
-    message_to_send = {'message': 'Hi', 'recipient': recipient_account_number}
-    await sync_to_async(block_send)(message_to_send)
+    message = {
+        'id': 'dc348eac-fc89-4b4e-96de-4a988e0b94e1',
+        'sender': sender_account_number,
+        'recipient': recipient_account_number,
+        'amount': 5,
+        'transaction_fee': 1,
+        'payload': {
+            'message': 'Hey'
+        }
+    }
+    await sync_to_async(send)(MessageType.CREATE_BLOCK, recipient_account_number, message)
 
-    received_message = await communicator.receive_json_from()
-    assert message_to_send == received_message
+    assert await communicator.receive_json_from() == {
+        'type': 'create.block',
+        'message': message,
+    }
 
     await communicator.disconnect()
 
@@ -198,7 +209,7 @@ def test_create_block_if_owner_account_is_not_configured(
     assert not Account.objects.filter(account_number__isnull=True).exists()
     assert not Account.objects.filter(account_number='').exists()
 
-    send_mock.assert_called_once_with(payload)
+    send_mock.assert_called_once_with(MessageType.CREATE_BLOCK, payload['recipient'], payload)
 
 
 @pytest.mark.parametrize(
@@ -423,7 +434,7 @@ def test_create_block_if_amount_is_zero(sender_key_pair, sender_account, recipie
     assert block.signature == payload['signature']
 
     assert not Account.objects.filter(account_number=recipient_account_number).exists()
-    send_mock.assert_called_once_with(payload)
+    send_mock.assert_called_once_with(MessageType.CREATE_BLOCK, payload['recipient'], payload)
 
 
 def test_cannot_create_block_with_invalid_signature(

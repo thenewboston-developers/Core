@@ -1,18 +1,10 @@
-import channels.layers
-from asgiref.sync import async_to_sync
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
 
-from core.accounts.consumers import AccountConsumer
+from core.accounts.consumers import MessageType, send
 from core.core.views import CustomGenericViewSet
 
 from ..models.block import Block
 from ..serializers.block import BlockSerializer
-
-
-def send(block_data):
-    channel_layer = channels.layers.get_channel_layer()
-    payload = {'type': 'send.block', 'message': block_data}
-    async_to_sync(channel_layer.group_send)(AccountConsumer.group_name(block_data['recipient']), payload)
 
 
 class BlockViewSet(CreateModelMixin, ListModelMixin, CustomGenericViewSet):
@@ -21,5 +13,6 @@ class BlockViewSet(CreateModelMixin, ListModelMixin, CustomGenericViewSet):
 
     def perform_create(self, serializer):
         rv = super().perform_create(serializer)
-        send(serializer.data)
+        message = serializer.data
+        send(MessageType.CREATE_BLOCK, message['recipient'], message)
         return rv
