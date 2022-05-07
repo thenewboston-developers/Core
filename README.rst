@@ -65,3 +65,12 @@ Create block message::
         }
       }
     }
+
+Update account message::
+
+    {
+      "type": "update.account",
+      "message": {
+        "balance": 35
+      }
+    }

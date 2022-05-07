@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import call, patch
 from uuid import UUID
 
 import pytest
@@ -14,7 +14,7 @@ from core.core.utils.cryptography import sign_dict
 from core.project.asgi import application
 
 
-@pytest.mark.parametrize('do_accounts_exist', (False, True))
+@pytest.mark.parametrize('do_accounts_exist', (True, False))
 @pytest.mark.usefixtures('owner_account_setting')
 def test_create_block(
     sender_key_pair, sender_account, recipient_account_number, owner_account_number, do_accounts_exist, api_client
@@ -43,7 +43,7 @@ def test_create_block(
         }
     }
     sign_dict(payload, sender_key_pair.private)
-    with patch('core.blocks.views.block.send') as send_mock:
+    with patch('core.accounts.consumers.send') as send_mock:
         response = api_client.post('/api/blocks', payload)
 
     assert response.status_code == 201
@@ -73,7 +73,12 @@ def test_create_block(
     else:
         assert not owner_account
 
-    send_mock.assert_called_once_with(MessageType.CREATE_BLOCK, payload['recipient'], payload)
+    assert send_mock.mock_calls == [
+        # Call order is important!
+        call(MessageType.CREATE_BLOCK, payload['recipient'], payload),
+        call(MessageType.UPDATE_ACCOUNT, payload['sender'], {'balance': sender_account.balance}),
+        call(MessageType.UPDATE_ACCOUNT, payload['recipient'], {'balance': recipient_account.balance}),
+    ]
 
 
 @pytest.mark.usefixtures('owner_account_setting')
@@ -94,7 +99,7 @@ def test_cannot_do_replay_attack(sender_key_pair, sender_account, recipient_acco
         }
     }
     sign_dict(payload, sender_key_pair.private)
-    with patch('core.blocks.views.block.send') as send_mock:
+    with patch('core.accounts.consumers.send') as send_mock:
         response = api_client.post('/api/blocks', payload)
 
     assert response.status_code == 201
@@ -117,9 +122,14 @@ def test_cannot_do_replay_attack(sender_key_pair, sender_account, recipient_acco
     recipient_account.refresh_from_db()
     assert recipient_account.balance == recipient_initial_balance + 5
 
-    send_mock.assert_called_once_with(MessageType.CREATE_BLOCK, payload['recipient'], payload)
+    assert send_mock.mock_calls == [
+        # Call order is important!
+        call(MessageType.CREATE_BLOCK, payload['recipient'], payload),
+        call(MessageType.UPDATE_ACCOUNT, payload['sender'], {'balance': sender_account.balance}),
+        call(MessageType.UPDATE_ACCOUNT, payload['recipient'], {'balance': recipient_account.balance}),
+    ]
 
-    with patch('core.blocks.views.block.send') as send_mock:
+    with patch('core.accounts.consumers.send') as send_mock:
         response = api_client.post('/api/blocks', payload)
 
     assert response.status_code == 400
@@ -183,7 +193,7 @@ def test_create_block_if_owner_account_is_not_configured(
         }
     }
     sign_dict(payload, sender_key_pair.private)
-    with patch('core.blocks.views.block.send') as send_mock:
+    with patch('core.accounts.consumers.send') as send_mock:
         response = api_client.post('/api/blocks', payload)
 
     assert response.status_code == 201
@@ -209,7 +219,12 @@ def test_create_block_if_owner_account_is_not_configured(
     assert not Account.objects.filter(account_number__isnull=True).exists()
     assert not Account.objects.filter(account_number='').exists()
 
-    send_mock.assert_called_once_with(MessageType.CREATE_BLOCK, payload['recipient'], payload)
+    assert send_mock.mock_calls == [
+        # Call order is important!
+        call(MessageType.CREATE_BLOCK, payload['recipient'], payload),
+        call(MessageType.UPDATE_ACCOUNT, payload['sender'], {'balance': sender_account.balance}),
+        call(MessageType.UPDATE_ACCOUNT, payload['recipient'], {'balance': recipient_account.balance}),
+    ]
 
 
 @pytest.mark.parametrize(
@@ -405,6 +420,8 @@ def test_create_block_if_amount_is_zero(sender_key_pair, sender_account, recipie
     assert not Block.objects.exists()
     assert not Account.objects.filter(account_number=recipient_account_number).exists()
 
+    sender_initial_balance = sender_account.balance
+
     payload = {
         'id': 'dc348eac-fc89-4b4e-96de-4a988e0b94e1',
         'sender': sender_account.account_number,
@@ -416,7 +433,7 @@ def test_create_block_if_amount_is_zero(sender_key_pair, sender_account, recipie
         }
     }
     sign_dict(payload, sender_key_pair.private)
-    with patch('core.blocks.views.block.send') as send_mock:
+    with patch('core.accounts.consumers.send') as send_mock:
         response = api_client.post('/api/blocks', payload)
 
     assert response.status_code == 201
@@ -434,7 +451,15 @@ def test_create_block_if_amount_is_zero(sender_key_pair, sender_account, recipie
     assert block.signature == payload['signature']
 
     assert not Account.objects.filter(account_number=recipient_account_number).exists()
-    send_mock.assert_called_once_with(MessageType.CREATE_BLOCK, payload['recipient'], payload)
+
+    sender_account.refresh_from_db()
+    assert sender_account.balance == sender_initial_balance - 1
+
+    assert send_mock.mock_calls == [
+        # Call order is important!
+        call(MessageType.CREATE_BLOCK, payload['recipient'], payload),
+        call(MessageType.UPDATE_ACCOUNT, payload['sender'], {'balance': sender_account.balance}),
+    ]
 
 
 def test_cannot_create_block_with_invalid_signature(
@@ -454,7 +479,7 @@ def test_cannot_create_block_with_invalid_signature(
         },
         'signature': '0' * 128
     }
-    with patch('core.blocks.views.block.send') as send_mock:
+    with patch('core.accounts.consumers.send') as send_mock:
         response = api_client.post('/api/blocks', payload)
 
     assert response.status_code == 400
@@ -480,7 +505,7 @@ def test_cannot_create_block_without_signature(sender_key_pair, sender_account, 
             'message': 'Hey'
         },
     }
-    with patch('core.blocks.views.block.send') as send_mock:
+    with patch('core.accounts.consumers.send') as send_mock:
         response = api_client.post('/api/blocks', payload)
 
     assert response.status_code == 400
