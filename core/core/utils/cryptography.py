@@ -1,5 +1,5 @@
 import json
-from typing import NamedTuple, Optional
+from typing import NamedTuple
 from uuid import UUID
 
 from nacl.exceptions import CryptoError
@@ -51,13 +51,12 @@ def generate_key_pair() -> KeyPair:
     return KeyPair(bytes_to_hex(signing_key.verify_key), bytes_to_hex(bytes(signing_key)))
 
 
-def is_dict_signature_valid(dict_: dict, verify_key: str, signature: Optional[str] = None) -> bool:
-    dict_ = dict_.copy()
-    if not (signature := signature or dict_.pop('signature', None)):
-        return False
+def is_dict_signature_valid(dict_: dict, verify_key: str, signature: str) -> bool:
+    if 'signature' in dict_:
+        dict_ = dict_.copy()
+        del dict_['signature']
 
-    message = normalize_dict(dict_)
-    return is_signature_valid(message, verify_key, signature)
+    return is_signature_valid(normalize_dict(dict_), verify_key, signature)
 
 
 def sign_dict(dict_: dict, signing_key: str):

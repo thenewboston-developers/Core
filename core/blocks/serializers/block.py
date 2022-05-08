@@ -22,7 +22,7 @@ class BlockSerializer(ValidateFieldsMixin, ModelSerializer):
         if sender == attrs['recipient']:
             raise ValidationError('Sender and recipient can not be the same')
 
-        if not is_dict_signature_valid(attrs, attrs['sender']):
+        if not is_dict_signature_valid(attrs, attrs['sender'], attrs['signature']):
             raise ValidationError({'signature': ['Invalid']})
 
         amount = attrs['amount']
