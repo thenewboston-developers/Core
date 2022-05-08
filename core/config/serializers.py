@@ -31,8 +31,7 @@ class ConfigSerializer(ValidateFieldsMixin, serializers.ModelSerializer):
         fields = ('account_number', 'signature', 'owner', 'transaction_fee')
 
     def validate(self, attrs):
-        # TODO(dmu) MEDIUM: Consider DRYing up with core.accounts.serializers.account.AccountSerializer.validate()
-        #                   Or implementation of Authorization HTTP-header based signing
+        # TODO(dmu) MEDIUM: Consider implementation of Authorization HTTP-header based signing
         attrs = super().validate(attrs)
 
         owner = self.instance.owner
