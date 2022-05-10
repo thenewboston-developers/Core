@@ -31,9 +31,11 @@ class Account(CustomModel):
             # TODO(dmu) MEDIUM: Consider always send an update notifications, but containing only those fields that
             #                   were updated
             # TODO(dmu) MEDIUM: Consider using serializer to create `message` if it gets more complex
+            account_number = self.account_number
+            message = {'account_number': account_number, 'balance': self.balance}
             apply_on_commit(
                 # `consumers.send` so we can mock `send` in `consumers`
-                partial(consumers.send, MessageType.UPDATE_ACCOUNT, self.account_number, {'balance': self.balance})
+                partial(consumers.send, MessageType.UPDATE_ACCOUNT, account_number, message)
             )
 
         return super().save(*args, **kwargs)

@@ -76,8 +76,18 @@ def test_create_block(
     assert send_mock.mock_calls == [
         # Call order is important!
         call(MessageType.CREATE_BLOCK, payload['recipient'], payload),
-        call(MessageType.UPDATE_ACCOUNT, payload['sender'], {'balance': sender_account.balance}),
-        call(MessageType.UPDATE_ACCOUNT, payload['recipient'], {'balance': recipient_account.balance}),
+        call(
+            MessageType.UPDATE_ACCOUNT, payload['sender'], {
+                'account_number': sender_account.account_number,
+                'balance': sender_account.balance,
+            }
+        ),
+        call(
+            MessageType.UPDATE_ACCOUNT, payload['recipient'], {
+                'account_number': recipient_account.account_number,
+                'balance': recipient_account.balance,
+            }
+        ),
     ]
 
 
@@ -125,8 +135,18 @@ def test_cannot_do_replay_attack(sender_key_pair, sender_account, recipient_acco
     assert send_mock.mock_calls == [
         # Call order is important!
         call(MessageType.CREATE_BLOCK, payload['recipient'], payload),
-        call(MessageType.UPDATE_ACCOUNT, payload['sender'], {'balance': sender_account.balance}),
-        call(MessageType.UPDATE_ACCOUNT, payload['recipient'], {'balance': recipient_account.balance}),
+        call(
+            MessageType.UPDATE_ACCOUNT, payload['sender'], {
+                'account_number': sender_account.account_number,
+                'balance': sender_account.balance,
+            }
+        ),
+        call(
+            MessageType.UPDATE_ACCOUNT, payload['recipient'], {
+                'account_number': recipient_account.account_number,
+                'balance': recipient_account.balance,
+            }
+        ),
     ]
 
     with patch('core.accounts.consumers.send') as send_mock:
@@ -222,8 +242,18 @@ def test_create_block_if_owner_account_is_not_configured(
     assert send_mock.mock_calls == [
         # Call order is important!
         call(MessageType.CREATE_BLOCK, payload['recipient'], payload),
-        call(MessageType.UPDATE_ACCOUNT, payload['sender'], {'balance': sender_account.balance}),
-        call(MessageType.UPDATE_ACCOUNT, payload['recipient'], {'balance': recipient_account.balance}),
+        call(
+            MessageType.UPDATE_ACCOUNT, payload['sender'], {
+                'account_number': sender_account.account_number,
+                'balance': sender_account.balance,
+            }
+        ),
+        call(
+            MessageType.UPDATE_ACCOUNT, payload['recipient'], {
+                'account_number': recipient_account.account_number,
+                'balance': recipient_account.balance,
+            }
+        ),
     ]
 
 
@@ -458,7 +488,12 @@ def test_create_block_if_amount_is_zero(sender_key_pair, sender_account, recipie
     assert send_mock.mock_calls == [
         # Call order is important!
         call(MessageType.CREATE_BLOCK, payload['recipient'], payload),
-        call(MessageType.UPDATE_ACCOUNT, payload['sender'], {'balance': sender_account.balance}),
+        call(
+            MessageType.UPDATE_ACCOUNT, payload['sender'], {
+                'account_number': sender_account.account_number,
+                'balance': sender_account.balance,
+            }
+        ),
     ]
 
 
