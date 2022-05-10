@@ -71,6 +71,7 @@ Update account message::
     {
       "type": "update.account",
       "message": {
+        "account_number": "995bd2a4db610062f404510617e83126fa37e2836805975f334108b55523634c",
         "balance": 35
       }
     }
