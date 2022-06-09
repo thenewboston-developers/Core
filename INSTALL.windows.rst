@@ -1,22 +1,49 @@
-Local development environment setup
-===================================
+Local development environment setup (for Windows)
+=================================================
 
-This section describes how to setup development environment for MacOS systems (tested on MacOS BigSur Apple M1 chip).
+This section describes how to setup development environment for Windows (tested on Windows 10 specifically).
+
+This guide will use Widows Subsystem for Linux (WSL) to get the development environment running on Windows.
+
+IMPORTANT: After the setup is complete, refer to https://code.visualstudio.com/docs/remote/wsl on how to use VS Code
+with WSL.
 
 Initial setup
 +++++++++++++
 Once initial setup is done only corresponding `Update`_ section should be performed to get the latest version for
 development.
 
-#. Install brew::
+#. Install Windows Subsystem for Linux (WSL)
 
-   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   As described on https://docs.microsoft.com/en-us/windows/wsl/install
+   run Windows Powershell as administrator and run::
+    wsl --install
 
-#. Install prerequisites (as prescribed at https://github.com/pyenv/pyenv/wiki/Common-build-problems and some other)::
+   Restart system after this
+
+   Then enable WSL by running Powershell as Administrator and run the command::
+    dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+
+   Just to be safe, restart system again
+
+#. Install Ubuntu environment on Windows
+
+   Search Microsoft store for Ubuntu and install it (Login not required)
+
+#. Search for Ubuntu in taskbar or open up a command prompt and type `ubuntu`. This should open up an Ubuntu terminal.
+
+   Run the rest of the commands in the ubuntu terminal.
+
+#. Install prerequisites (
+   as prescribed at https://github.com/pyenv/pyenv/wiki/Common-build-problems and some other)::
 
     # TODO(dmu) MEDIUM: Remove dependencies that are not really needed
     # TODO(dmu) MEDIUM: These dependencies seem to be candidates for removal: tk-dev wget curl llvm
-    brew install openssl readline sqlite3 xz zlib tcl-tk postgresql
+    sudo apt update && \
+    apt install git make build-essential libssl-dev zlib1g-dev libbz2-dev \
+                libreadline-dev libsqlite3-dev libncurses5-dev \
+                libncursesw5-dev xz-utils libffi-dev liblzma-dev \
+                python-openssl libpq-dev
 
 #. Install Docker according to https://docs.docker.com/engine/install/ubuntu/
    (known working: Docker version 20.10.14, build a224086)
@@ -31,15 +58,16 @@ development.
 
 #. Clone the repository::
 
-    git clone https://github.com/thenewboston-developers/Core.git
+    git clone git@github.com:thenewboston-developers/Core.git
 
 #. [if you have not configured it globally] Configure git::
 
     git config user.name 'Firstname Lastname'
     git config user.email 'youremail@youremail_domain.com'
 
-#. Ensure you have Python 3.10.x installed and it will be used for running the project (you can
-   do it with optional steps below)
+#. Ensure you have Python 3.10.x installed and it will be used for running the project (you can do it with optional
+    steps below)
+
 #. [Optional] Install Python 3.10.x with ``pyenv``
 
     #. Install and configure `pyenv` according to
@@ -62,8 +90,8 @@ development.
 #. Setup local configuration for running code on host::
 
     mkdir -p local && \
-    cp core/project/settings/templates/settings.dev.py ./local/settings.dev.py && \
-    cp core/project/settings/templates/settings.unittests.py ./local/settings.unittests.py
+    cp core/config/settings/templates/settings.dev.py ./local/settings.dev.py && \
+    cp core/config/settings/templates/settings.unittests.py ./local/settings.unittests.py
 
     # Edit files if needed
     vim ./local/settings.dev.py
@@ -102,6 +130,13 @@ Run
 #. (in a separate terminal) Run server::
 
     make run-server
+
+Run dockerized
+++++++++++++++
+
+#. Run dockerized::
+
+    make run-dockerized
 
 Development tools
 +++++++++++++++++
