@@ -21,7 +21,7 @@ class AccountSerializer(ValidateFieldsMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ('account_number', 'avatar', 'balance', 'display_name', 'signature')
+        fields = ('account_number', 'balance', 'signature')
         read_only_fields = (
             'account_number',
             'balance',

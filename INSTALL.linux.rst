@@ -1,5 +1,5 @@
-Local development environment setup
-===================================
+Local development environment setup for Linux
+=============================================
 
 This section describes how to setup development environment for Debian-based distributions
 (tested on Linux Mint 20.2 specifically)

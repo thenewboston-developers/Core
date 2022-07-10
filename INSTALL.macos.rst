@@ -1,5 +1,5 @@
-Local development environment setup
-===================================
+Local development environment setup for MacOS
+=============================================
 
 This section describes how to setup development environment for MacOS systems (tested on MacOS BigSur Apple M1 chip).
 
