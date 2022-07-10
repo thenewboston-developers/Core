@@ -1,5 +1,5 @@
-Local development environment setup (for Windows)
-=================================================
+Local development environment setup for Windows
+===============================================
 
 This section describes how to setup development environment for Windows (tested on Windows 10 specifically).
 
