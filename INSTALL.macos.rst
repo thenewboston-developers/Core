@@ -18,16 +18,13 @@ development.
     # TODO(dmu) MEDIUM: These dependencies seem to be candidates for removal: tk-dev wget curl llvm
     brew install openssl readline sqlite3 xz zlib tcl-tk postgresql
 
-#. Install Docker according to https://docs.docker.com/engine/install/ubuntu/
-   (known working: Docker version 20.10.14, build a224086)
+#. Install https://docs.docker.com/desktop/mac/install/
+   (installs with docker compose plugin built-in)
 
 #. Add your user to docker group::
 
     sudo usermod -aG docker $USER
     exit  # you may actually need to reboot for group membership to take effect
-
-#. Install Docker Compose according to https://docs.docker.com/compose/install/
-   (known working: Docker Compose version v2.4.1)
 
 #. Clone the repository::
 
@@ -42,8 +39,7 @@ development.
    do it with optional steps below)
 #. [Optional] Install Python 3.10.x with ``pyenv``
 
-    #. Install and configure `pyenv` according to
-       https://github.com/pyenv/pyenv#basic-github-checkout
+    #. Install and configure `pyenv` according to https://github.com/pyenv/pyenv#basic-github-checkout
 
     #. Install Python 3.10.4::
 

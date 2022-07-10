@@ -44,8 +44,7 @@ to get the latest version for development.
    do it with optional steps below)
 #. [Optional] Install Python 3.10.x with ``pyenv``
 
-    #. Install and configure `pyenv` according to
-       https://github.com/pyenv/pyenv#basic-github-checkout
+    #. Install and configure `pyenv` according to https://github.com/pyenv/pyenv#basic-github-checkout
 
     #. Install Python 3.10.4::
 
