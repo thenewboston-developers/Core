@@ -10,7 +10,7 @@ concurrency: master
 jobs:
   quality-assurance:
     name: Quality Assurance
-    uses: ./.github/workflows/pull-request-qa.yml
+    uses: ./.github/workflows/pr.yml
 
   publish-images:
     name: Publish docker images
