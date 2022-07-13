@@ -2,8 +2,6 @@ import yaml
 from django.conf import settings
 from django.db import transaction
 
-SENTINEL = object()
-
 
 def yaml_coerce(value):
     if isinstance(value, str):

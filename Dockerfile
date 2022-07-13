@@ -21,11 +21,11 @@ RUN set -xe \
 # require dependencies reinstallation)
 COPY ["pyproject.toml", "poetry.lock", "./"]
 RUN poetry run pip install pip==22.0.4
-RUN poetry install
+RUN poetry install --no-dev --no-root
 
 COPY ["LICENSE", "README.rst", "./"]
 COPY core core
-RUN poetry install  # this installs just the source code itself, since dependencies are installed before
+RUN poetry install --no-dev  # this installs just the source code itself, since dependencies are installed before
 
 COPY scripts/dockerized-core-run.sh ./run.sh
 RUN chmod a+x run.sh
