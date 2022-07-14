@@ -39,6 +39,7 @@ services:
       - core
     volumes:
       - letsencrypt:/etc/letsencrypt
+      - acme-challenge:/usr/share/nginx/html/.well-known/acme-challenge/
 
   certbot:
     image: certbot/certbot:v1.26.0
@@ -48,6 +49,7 @@ services:
     command: -c 'certbot renew; sleep 7d'
     volumes:
       - letsencrypt:/etc/letsencrypt
+      - acme-challenge:/usr/share/nginx/html/.well-known/acme-challenge/
 
 volumes:
   postgresql-data:
@@ -55,4 +57,6 @@ volumes:
   redis-data:
     driver: local
   letsencrypt:
+    driver: local
+  acme-challenge:
     driver: local
