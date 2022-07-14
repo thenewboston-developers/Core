@@ -68,6 +68,6 @@ jobs:
         #                   https://github.com/actions/runner/issues/520#issuecomment-877193387
         if: ${{ env.CONTINUOUS_DEPLOYMENT_ENABLED == 'True' }}
         run: |
-          ssh target "docker system prune --all --force && wget https://raw.githubusercontent.com/thenewboston-developers/Core/master/scripts/deploy.sh -O /tmp/deploy-core.sh && chmod a+x /tmp/deploy-core.sh && /tmp/deploy-core.sh ${{ github.actor }} ${{ secrets.GITHUB_TOKEN }} && rm -f /tmp/deploy-core.sh"
+          ssh target "docker system prune --all --force && wget https://raw.githubusercontent.com/thenewboston-developers/Core/master/scripts/deploy.sh -O /tmp/deploy-core.sh && chmod a+x /tmp/deploy-core.sh && /tmp/deploy-core.sh ${{ github.actor }} ${{ secrets.GITHUB_TOKEN }} thenewboston.network dmugtasimov@gmail.com && rm -f /tmp/deploy-core.sh"
         env:
           CONTINUOUS_DEPLOYMENT_ENABLED: ${{ secrets.CONTINUOUS_DEPLOYMENT_ENABLED }}

@@ -1,0 +1,2 @@
+if CORE_DOMAIN:
+    CSRF_TRUSTED_ORIGINS.append(f'https://{CORE_DOMAIN}')
