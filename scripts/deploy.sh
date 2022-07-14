@@ -30,7 +30,7 @@ echo 'Getting docker-compose.yml'
 wget https://raw.githubusercontent.com/thenewboston-developers/Core/master/docker-compose.yml -O docker-compose.yml
 
 echo 'Creating/updating .env file...'
-grep -q -o CORESETTING_SECRET_KEY .env 2> /dev/null || echo "CORESETTING_SECRET_KEY=$$(xxd -c 48 -l 48 -p /dev/urandom)" >> .env
+grep -q -o CORESETTING_SECRET_KEY .env 2> /dev/null || echo "CORESETTING_SECRET_KEY=$(xxd -c 48 -l 48 -p /dev/urandom)" >> .env
 
 if [[ -z "$CORESETTING_CORE_DOMAIN" || -z "$CERTBOT_EMAIL" ]]; then
   echo 'Interactive input mode for domain name and certbot email'
@@ -38,14 +38,14 @@ if [[ -z "$CORESETTING_CORE_DOMAIN" || -z "$CERTBOT_EMAIL" ]]; then
   if grep -q -o CORESETTING_CORE_DOMAIN .env 2> /dev/null; then
     echo 'Domain name is found in .env file'
   else
-    read -p 'Domain name: ' CORESETTING_CORE_DOMAIN
+    read -r -p 'Domain name: ' CORESETTING_CORE_DOMAIN
     echo "CORESETTING_CORE_DOMAIN=$CORESETTING_CORE_DOMAIN" >> .env
   fi
 
   if grep -q -o CERTBOT_EMAIL .env 2> /dev/null; then
     echo 'Email address for important certbot ACME notifications is found in .env file'
   else
-    read -p "Email address for important certbot ACME notifications (by typing it you agree to the ACME server's Subscriber Agreement): " CERTBOT_EMAIL
+    read -r -p "Email address for important certbot ACME notifications (by typing it you agree to the ACME server's Subscriber Agreement): " CERTBOT_EMAIL
     echo "CERTBOT_EMAIL=$CERTBOT_EMAIL" >> .env
   fi
 else
@@ -71,10 +71,9 @@ if docker compose run -it --rm certbot -c 'certbot certificates' | grep -q 'No c
   # TODO(dmu) LOW: Do we actually need to stop certbot?
   docker compose stop certbot  # make sure another instance of certbot does not interfere
 
-  set -o allexport
+  # TODO(dmu) MEDIUM: Handle special characters in variable values properly (maybe we should rather feed the .env
+  #                   to docker compose and read the values from the inside of the container)
   source .env
-  set +o allexport
-
   docker compose run -it --rm certbot -c "certbot certonly --agree-tos --email $CERTBOT_EMAIL --non-interactive --webroot --webroot-path /usr/share/nginx/html/ --domain $CORESETTING_CORE_DOMAIN --cert-name main"
   docker compose start certbot
 fi

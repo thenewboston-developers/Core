@@ -15,7 +15,7 @@ Common configuration
 #. Install Docker Compose  on target machine according to https://docs.docker.com/compose/install/
    (known working: Docker Compose version v2.4.1)
 
-#. Acquire a domain name and create a DNS record of type A pointing the target machine public IP-address
+#. Acquire a domain name and create a DNS record of type A pointing to the target machine public IP-address
 
 Manual deployment
 +++++++++++++++++
