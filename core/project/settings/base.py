@@ -4,7 +4,7 @@ DEBUG = False
 # TODO(dmu) MEDIUM: Consider a more secure value for `ALLOWED_HOSTS`
 ALLOWED_HOSTS = ['*']
 CORS_ALLOW_ALL_ORIGINS = True
-CSRF_TRUSTED_ORIGINS = ['https://thenewboston.network']
+CSRF_TRUSTED_ORIGINS = []
 
 INSTALLED_APPS = [
     'django.contrib.admin',

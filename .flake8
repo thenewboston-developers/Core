@@ -14,3 +14,4 @@ multiline-quotes = double
 per-file-ignores =
     core/project/settings/templates/settings.dev.py:F821
     core/project/settings/templates/settings.unittests.py:F821
+    core/project/settings/post.py:F821
