@@ -38,11 +38,11 @@ docker logout $DOCKER_REGISTRY_HOST
 
 if docker compose run -it --rm certbot -c 'certbot certificates' | grep -q 'No certificates found'; then
   echo 'Installing certificates...'
-  # docker compose down
-  # wget https://raw.githubusercontent.com/thenewboston-developers/Core/master/docker-compose.certbot.yml -O docker-compose.certbot.yml
-  # docker compose -f docker-compose.yml -f docker-compose.certbot.yml run -it --rm --service-ports certbot -c 'certbot certonly --agree-tos --email dmugtasimov@gmail.com --non-interactive --domain thenewboston.network --standalone'
-  docker compose -f docker-compose.yml -f docker-compose.certbot.yml run -it --rm certbot -c 'certbot certonly --agree-tos --email dmugtasimov@gmail.com --non-interactive --webroot --webroot-path /usr/share/nginx/html/ --domain thenewboston.network --cert-name main'
-  # rm -f docker-compose.certbot.yml
+  # TODO(dmu) LOW: Do we actually need to stop certbot?
+  # TODO(dmu) LOW: Consider moving certificate installation to cerbot service
+  docker compose stop certbot  # make sure another instance of certbot does not interfere
+  docker compose run -it --rm certbot -c 'certbot certonly --agree-tos --email dmugtasimov@gmail.com --non-interactive --webroot --webroot-path /usr/share/nginx/html/ --domain thenewboston.network --cert-name main'
+  docker compose start certbot
 fi
 
 echo 'Core API is up and running'
