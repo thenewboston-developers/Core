@@ -23,6 +23,8 @@ class Account(CustomModel):
         return f'{self.account_number} | {self.balance}'
 
     def save(self, *args, **kwargs):
+        # Having `self.tracker.has_changed('balance')` prevents from sending events when an instance is saved with
+        # the exact same value of balance (which is technically possible)
         if self.tracker.has_changed('balance') or self._state.adding:
             # TODO(dmu) MEDIUM: Consider always send an update notifications, but containing only those fields that
             #                   were updated
