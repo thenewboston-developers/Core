@@ -1,8 +1,11 @@
+import logging
 from enum import Enum
 
 import channels.layers
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
+
+logger = logging.getLogger(__name__)
 
 
 class MessageType(Enum):
@@ -16,7 +19,16 @@ class AccountConsumer(JsonWebsocketConsumer):
         """Accepts an incoming socket"""
         # TODO(dmu) MEDIUM: For some reason reusing websocket_connect() for adding groups to channel leads to
         #                   timeout error in unittest. Fix it
-        account_number = self.scope['url_route']['kwargs']['account_number']
+        scope = self.scope
+        authenticated_account_number = scope['authenticated_account_number']
+        account_number = scope['url_route']['kwargs']['account_number']
+        if not authenticated_account_number or authenticated_account_number != account_number:
+            logger.info(
+                '%s is not authorized to connect to %s', authenticated_account_number or 'Anonymous', account_number
+            )
+            self.close()
+            return
+
         async_to_sync(self.channel_layer.group_add)(self.group_name(account_number), self.channel_name)
         return super().connect()
 
