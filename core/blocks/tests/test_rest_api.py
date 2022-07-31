@@ -4,13 +4,14 @@ from uuid import UUID
 import pytest
 from asgiref.sync import sync_to_async
 from channels.testing import WebsocketCommunicator
+from django.utils import timezone
 from model_bakery import baker
 
 from core.accounts.consumers import MessageType, send
 from core.accounts.models import Account
 from core.blocks.models import Block
 from core.config.models import Config
-from core.core.utils.cryptography import sign_dict
+from core.core.utils.cryptography import generate_signature, sign_dict
 from core.project.asgi import application
 
 
@@ -167,22 +168,30 @@ def test_cannot_do_replay_attack(sender_key_pair, sender_account, recipient_acco
 
 
 @pytest.mark.asyncio
-async def test_block_send(sender_account_number, recipient_account_number):
-    communicator = WebsocketCommunicator(application, f'ws/accounts/{recipient_account_number}')
+async def test_block_send(sender_account_number, recipient_key_pair):
+    now = timezone.now().isoformat()
+    signature = generate_signature(now.encode('latin1'), recipient_key_pair.private)
+    token = f'{recipient_key_pair.public}${now}${signature}'
+
+    communicator = WebsocketCommunicator(
+        application,
+        f'ws/accounts/{recipient_key_pair.public}',
+        headers=[(b'authorization', f'SToken {token}'.encode('latin1'))]
+    )
     connected, _ = await communicator.connect()
     assert connected
 
     message = {
         'id': 'dc348eac-fc89-4b4e-96de-4a988e0b94e1',
         'sender': sender_account_number,
-        'recipient': recipient_account_number,
+        'recipient': recipient_key_pair.public,
         'amount': 5,
         'transaction_fee': 1,
         'payload': {
             'message': 'Hey'
         }
     }
-    await sync_to_async(send)(MessageType.CREATE_BLOCK, recipient_account_number, message)
+    await sync_to_async(send)(MessageType.CREATE_BLOCK, recipient_key_pair.public, message)
 
     assert await communicator.receive_json_from() == {
         'type': 'create.block',
