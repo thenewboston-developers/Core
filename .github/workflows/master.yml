@@ -24,15 +24,16 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Push core image to Github Packages
+        # TODO(dmu) LOW: Consider migration to docker/build-push-action@v3 and buildx
         uses: docker/build-push-action@v2
         with:
-          target: core
           tags: ghcr.io/thenewboston-developers/core:latest
           push: true
       - name: Push core-reverse-proxy image to Github Packages
+        # TODO(dmu) LOW: Consider migration to docker/build-push-action@v3 and buildx
         uses: docker/build-push-action@v2
         with:
-          target: core-reverse-proxy
+          file: Dockerfile-reverse-proxy
           tags: ghcr.io/thenewboston-developers/core-reverse-proxy:latest
           push: true
   deploy:
