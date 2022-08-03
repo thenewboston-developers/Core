@@ -48,7 +48,7 @@ development.
 
 #. Install Poetry::
 
-    export PIP_REQUIRED_VERSION=22.0.4
+    export PIP_REQUIRED_VERSION=22.2.1
     pip install pip==${PIP_REQUIRED_VERSION} && \
     pip install virtualenvwrapper && \
     pip install poetry==1.1.13 && \

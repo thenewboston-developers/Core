@@ -3,11 +3,11 @@ build: build-core build-reverse-proxy;
 
 .PHONY: build-core
 build-core:
-	docker build . --target=core -t core:current
+	docker build . -t core:current
 
 .PHONY: build-reverse-proxy
 build-reverse-proxy:
-	docker build . --target=core-reverse-proxy -t core-reverse-proxy:current
+	docker build . -f Dockerfile-reverse-proxy -t core-reverse-proxy:current
 
 .PHONY: superuser
 superuser:

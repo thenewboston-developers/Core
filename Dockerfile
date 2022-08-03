@@ -1,4 +1,4 @@
-FROM python:3.10.4-buster AS core
+FROM python:3.10.4-buster
 
 WORKDIR /opt/project
 
@@ -15,12 +15,12 @@ ENV CORESETTING_IN_DOCKER true
 RUN set -xe \
     && apt-get update \
     && apt-get install build-essential \
-    && pip install pip==22.0.4 virtualenvwrapper poetry==1.1.13
+    && pip install pip==22.2.1 virtualenvwrapper poetry==1.1.13
 
 # For image build time optimization purposes we install depdendencies here (so changes in the source code will not
 # require dependencies reinstallation)
 COPY ["pyproject.toml", "poetry.lock", "./"]
-RUN poetry run pip install pip==22.0.4
+RUN poetry run pip install pip==22.2.1
 RUN poetry install --no-dev --no-root
 
 COPY ["LICENSE", "README.rst", "./"]
@@ -29,8 +29,3 @@ RUN poetry install --no-dev  # this installs just the source code itself, since 
 
 COPY scripts/dockerized-core-run.sh ./run.sh
 RUN chmod a+x run.sh
-
-FROM nginx:1.21.6-alpine AS core-reverse-proxy
-
-RUN rm /etc/nginx/conf.d/default.conf
-COPY ./core/project/settings/templates/nginx.conf /etc/nginx/conf.d/core.conf
