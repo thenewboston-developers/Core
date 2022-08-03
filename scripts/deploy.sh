@@ -12,6 +12,8 @@ CERTBOT_EMAIL="${CERTBOT_EMAIL:-$4}"
 DOCKER_COMPOSE_FILES='-f docker-compose.yml'
 
 if [[ "$DOCKER_REGISTRY_HOST" == "ghcr.io" ]]; then
+  echo "Using $DOCKER_REGISTRY_HOST"
+
   docker logout $DOCKER_REGISTRY_HOST
 
   # Support github actions deploy as well as manual deploy
@@ -28,6 +30,8 @@ if [[ "$DOCKER_REGISTRY_HOST" == "ghcr.io" ]]; then
   wget https://raw.githubusercontent.com/thenewboston-developers/Core/master/docker-compose.github.yml -O docker-compose.github.yml
 
   DOCKER_COMPOSE_FILES="${DOCKER_COMPOSE_FILES} -f docker-compose.github.yml"
+else
+  echo 'Using Docker Hub'
 fi
 
 echo 'Getting docker-compose.yml'

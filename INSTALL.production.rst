@@ -26,6 +26,17 @@ Common configuration
 Manual deployment
 +++++++++++++++++
 
+From Docker Hub registry (recommended)
+--------------------------------------
+#. Run ``deploy.sh``::
+
+    bash <(wget -qO- https://raw.githubusercontent.com/thenewboston-developers/Core/master/scripts/deploy.sh)
+
+#. Continue with `Common steps`_ below
+
+From GitHub registry
+--------------------
+
 #. Prepare github personal access token aka PAT (not github password) - it will be needed to
    access the node docker image (description is based on
    https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token ):
@@ -44,9 +55,14 @@ Manual deployment
 
 #. Run ``deploy.sh``::
 
-    bash <(wget -qO- https://raw.githubusercontent.com/thenewboston-developers/Core/master/scripts/deploy.sh)
+    DOCKER_REGISTRY_HOST=ghcr.io bash <(wget -qO- https://raw.githubusercontent.com/thenewboston-developers/Core/master/scripts/deploy.sh)
 
-#. Create superuser::
+#. Continue with `Common steps`_ below
+
+Common steps
+------------
+
+#. (Optional, to be done once after the first deployment) Create superuser::
 
     docker compose exec -it core poetry run python -m core.manage createsuperuser
 
@@ -63,7 +79,7 @@ Configure continuous deployment
 
     CONTINUOUS_DEPLOYMENT_ENABLED=True
     DEPLOY_SSH_KEY=<content of ~/.ssh/github>
-    DEPLOY_SSH_HOST=<IP-address or domain name of target machine>
-    DEPLOY_SSH_USER=<username that has the corresponding public in ~/authorized_keys>
+    DEPLOY_SSH_HOST=<IP-address or domain name of the target machine>
+    DEPLOY_SSH_USER=<username that has the corresponding public key in ~/authorized_keys>
 
 This is a technical last line to serve as `end-of-file-fixer` workaround.

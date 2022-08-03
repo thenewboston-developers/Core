@@ -68,13 +68,8 @@ jobs:
         # TODO(dmu) MEDIUM: Refactor once/if github implements secrets on job level
         #                   https://github.com/actions/runner/issues/520#issuecomment-877193387
         if: ${{ env.CONTINUOUS_DEPLOYMENT_ENABLED == 'True' }}
+        # We need to deploy from GitHub because the image is guarantied to be ready by the moment of the deployment
         run: |
-          ssh target "docker system prune --all --force && wget https://raw.githubusercontent.com/thenewboston-developers/Core/master/scripts/deploy.sh -O /tmp/deploy-core.sh && chmod a+x /tmp/deploy-core.sh && /tmp/deploy-core.sh && rm -f /tmp/deploy-core.sh"
+          ssh target "docker system prune --all --force && wget https://raw.githubusercontent.com/thenewboston-developers/Core/master/scripts/deploy.sh -O /tmp/deploy-core.sh && chmod a+x /tmp/deploy-core.sh && export GITHUB_USERNAME=${{ github.actor }} && export GITHUB_PASSWORD=${{ secrets.GITHUB_TOKEN }} && export CORESETTING_CORE_DOMAIN=thenewboston.network && export CERTBOT_EMAIL=dmugtasimov@gmail.com && export DOCKER_REGISTRY_HOST=ghcr.io && /tmp/deploy-core.sh && rm -f /tmp/deploy-core.sh"
         env:
-          GITHUB_USERNAME: ${{ github.actor }}
-          GITHUB_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-          CORESETTING_CORE_DOMAIN: thenewboston.network
-          CERTBOT_EMAIL: dmugtasimov@gmail.com
           CONTINUOUS_DEPLOYMENT_ENABLED: ${{ secrets.CONTINUOUS_DEPLOYMENT_ENABLED }}
-          # We need to deploy from GitHub because the image is guarantied to be ready by the moment of the deployment
-          DOCKER_REGISTRY_HOST: ghcr.io
