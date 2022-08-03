@@ -72,6 +72,10 @@ lint:
 test:
 	poetry run pytest -v -rs -n auto --show-capture=no
 
+.PHONY: test-fail-fast
+test-fail-fast:
+	poetry run pytest -x -v -rs -n auto --show-capture=no
+
 .PHONY: test-stepwise
 test-stepwise:
 	poetry run pytest --reuse-db --sw -vv
@@ -79,6 +83,12 @@ test-stepwise:
 .PHONY: test-with-coverage
 test-with-coverage:
 	poetry run pytest -vv --cov=core --cov-report=html
+
+.PHONY: test-dockerized
+test-dockerized:
+	docker compose -f docker-compose.test.yml build
+	docker compose -f docker-compose.test.yml run -i --rm sut
+	docker compose -f docker-compose.test.yml stop db redis  # docker compose run leaves them running
 
 .PHONY: lint-and-test
 lint-and-test: lint test ;

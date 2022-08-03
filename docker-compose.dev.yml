@@ -18,6 +18,7 @@ services:
   core-reverse-proxy:
     restart: 'no'
 
+# TODO(dmu) LOW: Do we need `volumes` defined in this file?
 volumes:
   postgresql-data:
     driver: local

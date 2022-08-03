@@ -21,11 +21,14 @@ RUN set -xe \
 # require dependencies reinstallation)
 COPY ["pyproject.toml", "poetry.lock", "./"]
 RUN poetry run pip install pip==22.2.1
-RUN poetry install --no-dev --no-root
 
-COPY ["LICENSE", "README.rst", "./"]
+# We install dev dependencies to be able to run unittests inside the container
+# TODO(dmu) LOW: Once Docker Hub supports stages builds move dev dependencies to the next stage
+RUN poetry install --no-root
+
+COPY ["LICENSE", "README.rst", "Makefile", "conftest.py", "./"]
 COPY core core
-RUN poetry install --no-dev  # this installs just the source code itself, since dependencies are installed before
+RUN poetry install  # this installs just the source code itself, since dependencies are installed before
 
 COPY scripts/dockerized-core-run.sh ./run.sh
 RUN chmod a+x run.sh
