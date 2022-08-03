@@ -19,7 +19,7 @@ services:
       - redis-data:/var/lib/redis
 
   core:
-    image: ghcr.io/thenewboston-developers/core:latest
+    image: thenewboston/core:latest
     restart: unless-stopped
     command: ./run.sh
     environment:
@@ -31,7 +31,7 @@ services:
       - redis
 
   core-reverse-proxy:
-    image: ghcr.io/thenewboston-developers/core-reverse-proxy:latest
+    image: thenewboston/core-reverse-proxy:latest
     restart: unless-stopped
     ports:
       - 80:80
