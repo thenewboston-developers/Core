@@ -15,6 +15,12 @@ Common configuration
 #. Install Docker Compose  on target machine according to https://docs.docker.com/compose/install/
    (known working: Docker Compose version v2.4.1)
 
+#. Check that required docker images are available (thenewboston-developers/Core repo maintainer take care of it
+   with `<INSTALL.dockerhub.rst>`_ instructions)::
+
+    docker pull thenewboston/core
+    docker pull thenewboston/core-reverse-proxy
+
 #. Acquire a domain name and create a DNS record of type A pointing to the target machine public IP-address
 
 Manual deployment
