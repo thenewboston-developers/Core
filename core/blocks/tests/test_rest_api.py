@@ -169,17 +169,15 @@ def test_cannot_do_replay_attack(sender_key_pair, sender_account, recipient_acco
 
 @pytest.mark.asyncio
 async def test_block_send(sender_account_number, recipient_key_pair):
+    communicator = WebsocketCommunicator(application, f'ws/accounts/{recipient_key_pair.public}')
+    connected, _ = await communicator.connect()
+    assert connected
+
     now = timezone.now().isoformat()
     signature = generate_signature(now.encode('latin1'), recipient_key_pair.private)
     token = f'{recipient_key_pair.public}${now}${signature}'
-
-    communicator = WebsocketCommunicator(
-        application,
-        f'ws/accounts/{recipient_key_pair.public}',
-        headers=[(b'authorization', f'SToken {token}'.encode('latin1'))]
-    )
-    connected, _ = await communicator.connect()
-    assert connected
+    await communicator.send_json_to({'method': 'authenticate', 'token': token})
+    assert await communicator.receive_json_from(timeout=0.02) == {'result': 'authenticated'}
 
     message = {
         'id': 'dc348eac-fc89-4b4e-96de-4a988e0b94e1',
