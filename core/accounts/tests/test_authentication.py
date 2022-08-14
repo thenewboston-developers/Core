@@ -30,8 +30,12 @@ async def test_authentication(sender_account_number, recipient_key_pair):
     now = timezone.now().isoformat()
     signature = generate_signature(now.encode('latin1'), recipient_key_pair.private)
     token = f'{recipient_key_pair.public}${now}${signature}'
-    await communicator.send_json_to({'method': 'authenticate', 'token': token})
-    assert await communicator.receive_json_from(timeout=0.01) == {'result': 'authenticated'}
+    correlation_id = 'my-fake-random-correlation-id'
+    await communicator.send_json_to({'method': 'authenticate', 'token': token, 'correlation_id': correlation_id})
+    assert await communicator.receive_json_from(timeout=0.02) == {
+        'return_value': True,
+        'correlation_id': correlation_id
+    }
 
     message = {
         'id': 'dc348eac-fc89-4b4e-96de-4a988e0b94e2',
@@ -72,8 +76,12 @@ async def test_invalid_token_authentication(sender_account_number, recipient_key
     await sync_to_async(send)(MessageType.CREATE_BLOCK, recipient_key_pair.public, message)
     assert await communicator.receive_nothing()
 
-    await communicator.send_json_to({'method': 'authenticate', 'token': 'invalid'})
-    assert await communicator.receive_json_from(timeout=0.01) == {'result': 'unauthenticated'}
+    correlation_id = 'my-fake-random-correlation-id'
+    await communicator.send_json_to({'method': 'authenticate', 'token': 'invalid', 'correlation_id': correlation_id})
+    assert await communicator.receive_json_from(timeout=0.01) == {
+        'return_value': False,
+        'correlation_id': correlation_id
+    }
 
     message = {
         'id': 'dc348eac-fc89-4b4e-96de-4a988e0b94e2',
