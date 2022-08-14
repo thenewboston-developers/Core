@@ -17,10 +17,24 @@ class Account(CustomModel):
     )
     balance = models.PositiveBigIntegerField()
 
+    allowed_peers = models.ManyToManyField(
+        'self',
+        through='Peer',
+        through_fields=('allowing_peer', 'allowed_peer'),
+        symmetrical=False,
+        related_name='allowing_peers'
+    )
+
     tracker = FieldTracker()
 
     def __str__(self):
         return f'{self.account_number} | {self.balance}'
+
+    def is_mutual_peering(self, account_number):
+        return (
+            self.allowed_peers.filter(account_number=account_number).exists() and
+            self.allowing_peers.filter(account_number=account_number).exists()
+        )
 
     def save(self, *args, **kwargs):
         # Having `self.tracker.has_changed('balance')` prevents from sending events when an instance is saved with
