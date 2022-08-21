@@ -9,3 +9,7 @@ def custom_exception_handler(exc, context):
         exc.detail = exc.get_full_details()
 
     return exception_handler(exc, context)
+
+
+class NotAuthenticated(Exception):
+    pass

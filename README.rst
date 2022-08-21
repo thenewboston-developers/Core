@@ -52,11 +52,27 @@ Requests
 Authentication::
 
     {
-        "method": "authenticate",
-        "token": "6fac7f7e2b90173bfc6ef8ee34f9c92438b5eb8f579ef8d84464b820bbfecfc1$2022-08-11T01:28:47.811436+00:00$14b38d51678062770fd3135fa94925638331160102e7cfb50ab9152ee00a56b03445ea8f36e8d502faf6a3f8413920ddacbd4c763c93108fafff2bb5071ba40f"
+      "method": "authenticate",
+      "token": "6fac7f7e2b90173bfc6ef8ee34f9c92438b5eb8f579ef8d84464b820bbfecfc1$2022-08-11T01:28:47.811436+00:00$14b38d51678062770fd3135fa94925638331160102e7cfb50ab9152ee00a56b03445ea8f36e8d502faf6a3f8413920ddacbd4c763c93108fafff2bb5071ba40f",
+      "correlation_id": "any-random-string-to-identify-response"
     }
 
 token format: {account_number}${iso_formatted_datetime}${signature}
+
+Set peers::
+
+    {
+      "method": "set_peers",
+      "peers": ["eb01f474a637e402b44407f3c1044a0c4b59261515d50be9abd4ee34fcb9075b", "995bd2a4db610062f404510617e83126fa37e2836805975f334108b55523634c"],
+      "correlation_id": "any-random-string-to-identify-response"
+    }
+
+Set peers::
+
+    {
+      "method": "get_peers",
+      "correlation_id": "any-random-string-to-identify-response"
+    }
 
 Responses
 ---------
@@ -64,14 +80,38 @@ Responses
 Authentication success::
 
     {
-        "result": "authenticated"
+      "return_value": true,
+      "correlation_id": "any-random-string-to-identify-response"
     }
 
 Authentication failure::
 
     {
-        "result": "unauthenticated"
+      "return_value": false,
+      "correlation_id": "any-random-string-to-identify-response"
     }
+
+Set peers::
+
+    {
+      "return_value": None,
+      "correlation_id": "any-random-string-to-identify-response"
+    }
+
+Get peers::
+
+    {
+      "return_value": {
+        "eb01f474a637e402b44407f3c1044a0c4b59261515d50be9abd4ee34fcb9075b": {
+          "is_online: False
+        },
+        "995bd2a4db610062f404510617e83126fa37e2836805975f334108b55523634c": {
+          "is_online": True
+        }
+      },
+      "correlation_id": "any-random-string-to-identify-response"
+    }
+
 
 Create block message::
 
@@ -98,4 +138,20 @@ Update account message::
         "account_number": "6fac7f7e2b90173bfc6ef8ee34f9c92438b5eb8f579ef8d84464b820bbfecfc1",
         "balance": 35
       }
+    }
+
+Peer is online message::
+
+    {
+      "type": "track.online_status",
+      "is_online": true,
+      "account_number": "995bd2a4db610062f404510617e83126fa37e2836805975f334108b55523634c",
+    }
+
+Peer is offline message::
+
+    {
+      "type": "track.online_status",
+      "is_online": false,
+      "account_number": "eb01f474a637e402b44407f3c1044a0c4b59261515d50be9abd4ee34fcb9075b",
     }
