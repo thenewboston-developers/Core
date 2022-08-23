@@ -67,7 +67,7 @@ Set peers::
       "correlation_id": "any-random-string-to-identify-response"
     }
 
-Set peers::
+Get peers::
 
     {
       "method": "get_peers",
