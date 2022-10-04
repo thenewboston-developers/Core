@@ -63,8 +63,8 @@ to get the latest version for development.
 #. Setup local configuration for running code on host::
 
     mkdir -p local && \
-    cp core/config/settings/templates/settings.dev.py ./local/settings.dev.py && \
-    cp core/config/settings/templates/settings.unittests.py ./local/settings.unittests.py
+    cp core/project/settings/templates/settings.dev.py ./local/settings.dev.py && \
+    cp core/project/settings/templates/settings.unittests.py ./local/settings.unittests.py
 
     # Edit files if needed
     vim ./local/settings.dev.py
