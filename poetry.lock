@@ -292,14 +292,14 @@ python-versions = ">=3.6,<4.0"
 
 [[package]]
 name = "djangorestframework"
-version = "3.13.1"
+version = "3.14.0"
 description = "Web APIs for Django, made easy."
 category = "main"
 optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
-django = ">=2.2"
+django = ">=3.0"
 pytz = "*"
 
 [[package]]
@@ -828,7 +828,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "b912ce349895a92b623a797f7ffad090605851908a9b65799c0cf57846615da7"
+content-hash = "37bdc617f373d0157473e2fd00408f762763b2eb2ad47921308f41d40f5be621"
 
 [metadata.files]
 aioredis = [
@@ -979,10 +979,7 @@ django-split-settings = [
     {file = "django-split-settings-1.1.0.tar.gz", hash = "sha256:6b3aed89667a95525152026eab93a9f038ff22df6883006318b8b4a3d0ca6888"},
     {file = "django_split_settings-1.1.0-py3-none-any.whl", hash = "sha256:5d97ae64cf9ed14a831722d82ac725944667ac8c08307b7cfd22e91367b411d0"},
 ]
-djangorestframework = [
-    {file = "djangorestframework-3.13.1-py3-none-any.whl", hash = "sha256:24c4bf58ed7e85d1fe4ba250ab2da926d263cd57d64b03e8dcef0ac683f8b1aa"},
-    {file = "djangorestframework-3.13.1.tar.gz", hash = "sha256:0c33407ce23acc68eca2a6e46424b008c9c02eceb8cf18581921d0092bc1f2ee"},
-]
+djangorestframework = []
 execnet = [
     {file = "execnet-1.9.0-py2.py3-none-any.whl", hash = "sha256:a295f7cc774947aac58dde7fdc85f4aa00c42adf5d8f5468fc630c1acf30a142"},
     {file = "execnet-1.9.0.tar.gz", hash = "sha256:8f694f3ba9cc92cab508b152dcfe322153975c29bda272e2fd7f3f00f36e47c5"},
