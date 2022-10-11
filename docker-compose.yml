@@ -52,17 +52,6 @@ services:
       - letsencrypt:/etc/letsencrypt
       - acme-challenge:/usr/share/nginx/html/.well-known/acme-challenge/
 
-  certbot-install:
-    image: certbot/certbot:v1.26.0
-    restart: 'no'
-    ports:
-      - 80:80
-    entrypoint: /bin/sh
-    command: ''
-    volumes:
-      - letsencrypt:/etc/letsencrypt
-      - acme-challenge:/usr/share/nginx/html/.well-known/acme-challenge/
-
 volumes:
   postgresql-data:
     driver: local
