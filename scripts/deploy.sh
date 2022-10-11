@@ -88,6 +88,8 @@ if $DOCKER_COMPOSE_COMMAND run -it --rm certbot-renew -c 'certbot certificates' 
   #                   to docker compose and read the values from the inside of the container)
   source .env
   $DOCKER_COMPOSE_COMMAND run -it --rm --service-ports certbot-install -c "certbot certonly --agree-tos --email $CERTBOT_EMAIL --non-interactive --standalone --webroot-path /usr/share/nginx/html/ --domain $CORESETTING_CORE_DOMAIN --cert-name main"
+  # TODO(dmu) MEDIUM: Improve instead of `sleep 5`
+  sleep 5  # waiting until 80 port is actually freed
   $DOCKER_COMPOSE_COMMAND start core-reverse-proxy
   $DOCKER_COMPOSE_COMMAND start certbot-renew
 fi
