@@ -42,12 +42,23 @@ services:
       - letsencrypt:/etc/letsencrypt
       - acme-challenge:/usr/share/nginx/html/.well-known/acme-challenge/
 
-  certbot:
+  certbot-renew:
     image: certbot/certbot:v1.26.0
     restart: unless-stopped
     entrypoint: /bin/sh
     # This will let us check certificate expiration every 7 days and renew if needed
     command: -c 'certbot renew; sleep 7d'
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+      - acme-challenge:/usr/share/nginx/html/.well-known/acme-challenge/
+
+  certbot-install:
+    image: certbot/certbot:v1.26.0
+    restart: no
+    ports:
+      - 80:80
+    entrypoint: /bin/sh
+    command: ''
     volumes:
       - letsencrypt:/etc/letsencrypt
       - acme-challenge:/usr/share/nginx/html/.well-known/acme-challenge/
