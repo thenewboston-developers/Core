@@ -78,16 +78,18 @@ if [[ "$DOCKER_REGISTRY_HOST" == "ghcr.io" ]]; then
   docker logout $DOCKER_REGISTRY_HOST
 fi
 
-if $DOCKER_COMPOSE_COMMAND run -it --rm certbot -c 'certbot certificates' | grep -q 'No certificates found'; then
+# Using `certbot-renew` for check because it does not use port 80
+if $DOCKER_COMPOSE_COMMAND run -it --rm certbot-renew -c 'certbot certificates' | grep -q 'No certificates found'; then
   echo 'Installing certificates...'
-  # TODO(dmu) LOW: Do we actually need to stop certbot?
-  $DOCKER_COMPOSE_COMMAND stop certbot  # make sure another instance of certbot does not interfere
+  $DOCKER_COMPOSE_COMMAND stop certbot-renew  # make sure another instance of certbot does not interfere
+  $DOCKER_COMPOSE_COMMAND stop core-reverse-proxy
 
   # TODO(dmu) MEDIUM: Handle special characters in variable values properly (maybe we should rather feed the .env
   #                   to docker compose and read the values from the inside of the container)
   source .env
-  $DOCKER_COMPOSE_COMMAND run -it --rm certbot -c "certbot certonly --agree-tos --email $CERTBOT_EMAIL --non-interactive --webroot --webroot-path /usr/share/nginx/html/ --domain $CORESETTING_CORE_DOMAIN --cert-name main"
-  $DOCKER_COMPOSE_COMMAND start certbot
+  $DOCKER_COMPOSE_COMMAND run -it --rm certbot-install -c "certbot certonly --agree-tos --email $CERTBOT_EMAIL --non-interactive --standalone --webroot-path /usr/share/nginx/html/ --domain $CORESETTING_CORE_DOMAIN --cert-name main"
+  $DOCKER_COMPOSE_COMMAND start core-reverse-proxy
+  $DOCKER_COMPOSE_COMMAND start certbot-renew
 fi
 
 echo 'Core API is up and running'

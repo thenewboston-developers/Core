@@ -24,8 +24,30 @@ Create EC2 instance
 Create an EC2 instance::
 
     t2.micro
-    Ubuntu 20.04 64-bit (x86)
-    security group settings
+    Ubuntu 20.04 64-bit (x86), 16Gb storage
+    Allow SSH, HTTP, HTTPs
+
+Setup domain
+++++++++++++
+
+Domain Name
+-----------
+
+#. Navigate to EC2 > Network and Security > Elastic IPs
+#. Click the "Allocate Elastic IP address" button
+#. Click the Allocate button
+#. Give that Elastic IP a more memorable name
+#. Select it and choose click on "Associate Elastic IP address"
+#. Choose your core instance in "Instance" dropdown box
+#. Check "Allow this Elastic IP address to be reassociated"
+#. Click on "Associate"
+#. Test by SSHing into the instance using the new IP.
+
+Update your domain's DNS records to point to your elastic IP
+------------------------------------------------------------
+
+#. Create type A DNS record for your domain, which points to the Elastic IP
+#. Test by SSHing into the instance using the domain name
 
 Install Docker
 ++++++++++++++
@@ -37,10 +59,7 @@ Login to the EC2 instance
 
 Login to the EC2 instance::
 
-    # TODO(dmu) HIGH: It is better to configure DNS names first, so we can you domain name instead of IP-address
-    # IP_ADDRESS is the IP-address
-    ssh ubuntu@IP_ADDRESS
-
+    ssh ubuntu@DOMAIN_NAME
 
 Uninstall any existing versions of Docker
 -----------------------------------------
@@ -91,44 +110,13 @@ Install Docker Engine
     sudo usermod -aG docker $USER
     exit
 
+    # Login to the EC2 instance again
+    ssh ubuntu@DOMAIN_NAME
+
 #. Pull the images::
 
     docker pull thenewboston/core
     docker pull thenewboston/core-reverse-proxy
-
-
-Install Docker Compose
-----------------------
-
-Install Docker Compose (known working version v2.4.1) on target machine
-according to https://docs.docker.com/compose/install/
-
-Setup domain
-++++++++++++
-
-Domain Name
------------
-
-#. Navigate to EC2 > Network and Security > Elastic IPs
-#. Click the "Allocate Elastic IP address" button
-#. Click the Allocate button
-#. Give that Elastic IP a more memorable name
-#. Select it and choose click on “Associate Elastic IP address”
-#. Associate it with your core instance
-#. Check “Allow this Elastic IP address to be reassociated”
-#. Click on “Associate”
-#. Test by SSHing into the instance using the new IP.
-
-Update your domain's DNS records to point to your elastic IP
-------------------------------------------------------------
-
-#. Create type A DNS record for your domain, which points to your elastic IP
-#. Test by SSHing into the instance using the domain name
-
-TODO:
-SSL
-redirect http to https, no-www to www
-
 
 Install Core
 ++++++++++++
