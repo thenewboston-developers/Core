@@ -54,7 +54,7 @@ services:
 
   certbot-install:
     image: certbot/certbot:v1.26.0
-    restart: no
+    restart: 'no'
     ports:
       - 80:80
     entrypoint: /bin/sh
