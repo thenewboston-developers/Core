@@ -87,9 +87,8 @@ if $DOCKER_COMPOSE_COMMAND run -it --rm certbot-renew -c 'certbot certificates' 
   # TODO(dmu) MEDIUM: Handle special characters in variable values properly (maybe we should rather feed the .env
   #                   to docker compose and read the values from the inside of the container)
   source .env
-  $DOCKER_COMPOSE_COMMAND run -it --rm --service-ports certbot-install -c "certbot certonly --agree-tos --email $CERTBOT_EMAIL --non-interactive --standalone --webroot-path /usr/share/nginx/html/ --domain $CORESETTING_CORE_DOMAIN --cert-name main"
-  # TODO(dmu) MEDIUM: Improve instead of `sleep 5`
-  sleep 5  # waiting until 80 port is actually freed
+  wget https://raw.githubusercontent.com/thenewboston-developers/Core/master/docker-compose.certbot.yml -O docker-compose.certbot.yml
+  $DOCKER_COMPOSE_COMMAND -f docker-compose.certbot.yml run -it --rm --service-ports certbot-install -c "certbot certonly --agree-tos --email $CERTBOT_EMAIL --non-interactive --standalone --webroot-path /usr/share/nginx/html/ --domain $CORESETTING_CORE_DOMAIN --cert-name main"
   $DOCKER_COMPOSE_COMMAND start core-reverse-proxy
   $DOCKER_COMPOSE_COMMAND start certbot-renew
 fi
