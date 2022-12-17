@@ -1,6 +1,6 @@
 FROM nginx:1.21.6-alpine
 
-RUN apk add inotify-tools
+RUN apk update && apk add bash inotify-tools
 
 RUN rm /etc/nginx/conf.d/default.conf
 COPY ./core/project/settings/templates/nginx.conf /etc/nginx/conf.d/core.conf
