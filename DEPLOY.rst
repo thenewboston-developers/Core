@@ -125,29 +125,6 @@ Run the deployment script::
 
     bash <(wget -qO- https://raw.githubusercontent.com/thenewboston-developers/Core/master/scripts/deploy.sh)
 
-.. image:: images/deployment-script.png
-
-
-Here is the text::
-
-    Saving debug log to /var/log/letsencrypt/letsencrypt.log
-    Installing certificates...
-    [+] Running 1/1
-     ⠿ Container ubuntu-certbot-1  Stopped                                                                                                                                                                                                                                                 10.3s
-    Saving debug log to /var/log/letsencrypt/letsencrypt.log
-    Account registered.
-    Requesting a certificate for penguinchess.io
-
-    Certbot failed to authenticate some domains (authenticator: webroot). The Certificate Authority reported these problems:
-      Domain: penguinchess.io
-      Type:   connection
-      Detail: 54.184.108.145: Fetching http://penguinchess.io/.well-known/acme-challenge/iG40ZwkCgpgaictydz5JTdV9AUeue6aE5q4-xY2N7QM: Connection refused
-
-    Hint: The Certificate Authority failed to download the temporary challenge files created by Certbot. Ensure that the listed domains serve their content from the provided --webroot-path/-w and that files created there can be downloaded from the internet.
-
-    Some challenges have failed.
-    Ask for help or search for solutions at https://community.letsencrypt.org. See the logfile /var/log/letsencrypt/letsencrypt.log or re-run Certbot with -v for more details.
-
 Create superuser
 ++++++++++++++++
 
