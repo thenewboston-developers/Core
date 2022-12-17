@@ -47,7 +47,7 @@ services:
     restart: unless-stopped
     entrypoint: /bin/sh
     # This will let us check certificate expiration every 7 days and renew if needed
-    command: -c 'certbot renew; sleep 7d'
+    command: -c 'date; certbot renew; sleep 7d'
     volumes:
       - letsencrypt:/etc/letsencrypt
       - acme-challenge:/usr/share/nginx/html/.well-known/acme-challenge/
