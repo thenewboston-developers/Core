@@ -53,10 +53,10 @@ to get the latest version for development.
 
 #. Install Poetry::
 
-    export PIP_REQUIRED_VERSION=22.2.1
+    export PIP_REQUIRED_VERSION=23.0
     pip install pip==${PIP_REQUIRED_VERSION} && \
     pip install virtualenvwrapper && \
-    pip install poetry==1.1.13 && \
+    pip install poetry==1.3.2 && \
     poetry config virtualenvs.path ${HOME}/.virtualenvs && \
     poetry run pip install pip==${PIP_REQUIRED_VERSION}
 

@@ -6,7 +6,7 @@ authors = ["bucky <buckyroberts@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = ">=3.10,<4.0"
 Django = ">=4.1.1"
 djangorestframework = ">=3.14.0"
 psycopg2 = "^2.9.3"
@@ -20,7 +20,7 @@ PyNaCl = "^1.5.0"
 django-cors-headers = "^3.11.0"
 django-model-utils = "^4.2.0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pre-commit = "^3.0.2"
 colorlog = "^6.6.0"
 pytest = "^7.1.2"

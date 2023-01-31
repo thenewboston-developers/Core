@@ -15,12 +15,12 @@ ENV CORESETTING_IN_DOCKER true
 RUN set -xe \
     && apt-get update \
     && apt-get install build-essential \
-    && pip install pip==22.2.1 virtualenvwrapper poetry==1.1.13
+    && pip install pip==23.0 virtualenvwrapper poetry==1.3.2
 
 # For image build time optimization purposes we install depdendencies here (so changes in the source code will not
 # require dependencies reinstallation)
 COPY ["pyproject.toml", "poetry.lock", "./"]
-RUN poetry run pip install pip==22.2.1
+RUN poetry run pip install pip==23.0
 
 # We install dev dependencies to be able to run unittests inside the container
 # TODO(dmu) LOW: Once Docker Hub supports stages builds move dev dependencies to the next stage
