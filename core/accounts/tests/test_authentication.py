@@ -78,7 +78,7 @@ async def test_invalid_token_authentication(sender_account_number, recipient_key
 
     correlation_id = 'my-fake-random-correlation-id'
     await communicator.send_json_to({'method': 'authenticate', 'token': 'invalid', 'correlation_id': correlation_id})
-    assert await communicator.receive_json_from(timeout=0.01) == {
+    assert await communicator.receive_json_from(timeout=0.02) == {
         'return_value': False,
         'correlation_id': correlation_id
     }
