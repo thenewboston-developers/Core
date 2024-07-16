@@ -24,7 +24,7 @@ Create EC2 instance
 Create an EC2 instance::
 
     t2.micro
-    Ubuntu 20.04 64-bit (x86), 16Gb storage
+    Ubuntu 24.04 64-bit (x86), 16Gb storage
     Allow SSH, HTTP, HTTPs
 
 Setup domain
@@ -52,7 +52,9 @@ Update your domain's DNS records to point to your elastic IP
 Install Docker
 ++++++++++++++
 To install Docker (known working version 20.10.14, build a224086) on target machine follow the instructions below
-(based on https://docs.docker.com/engine/install/ubuntu/ )
+(based on https://docs.docker.com/engine/install/ubuntu/ ).
+TODO(dmu) HIGH: Please, use instruction directly from the link https://docs.docker.com/engine/install/ubuntu/ ,
+because the copied steps require update
 
 Login to the EC2 instance
 -------------------------
