@@ -51,10 +51,8 @@ Update your domain's DNS records to point to your elastic IP
 
 Install Docker
 ++++++++++++++
-To install Docker (known working version 20.10.14, build a224086) on target machine follow the instructions below
+To install Docker (known working version 27.0.3, build 7d4bcd8) on target machine follow the instructions below
 (based on https://docs.docker.com/engine/install/ubuntu/ ).
-TODO(dmu) HIGH: Please, use instruction directly from the link https://docs.docker.com/engine/install/ubuntu/ ,
-because the copied steps require update
 
 Login to the EC2 instance
 -------------------------
@@ -68,7 +66,7 @@ Uninstall any existing versions of Docker
 
 It's OK if apt reports that none of these packages are installed::
 
-    sudo apt remove docker docker-engine docker.io containerd runc
+    for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
 
 Set up the repository
 ---------------------
@@ -76,33 +74,29 @@ Set up the repository
 Before you install Docker Engine for the first time on a new host machine,
 you need to set up the Docker repository. Afterward, you can install and update Docker from the repository::
 
-    # update the package cache and upgrade packages
-    sudo apt -y update && sudo apt -y upgrade
+    # Add Docker's official GPG key:
+    sudo apt-get update
+    sudo apt-get install ca-certificates curl
+    sudo install -m 0755 -d /etc/apt/keyrings
+    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    sudo chmod a+r /etc/apt/keyrings/docker.asc
 
-    # install packages to allow apt to use a repository over HTTPS
-    sudo apt -y install ca-certificates curl gnupg lsb-release
-
-    # add Dockers official GPG key
-    sudo mkdir -p /etc/apt/keyrings
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-
-    # use the following command to set up the repository
+    # Add the repository to Apt sources:
     echo \
-      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-      $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
+      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+      $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+      sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    sudo apt-get update
 
 Install Docker Engine
 ---------------------
 
 #. Install Docker Engine::
 
-    # update the apt package index, and install the latest version of Docker Engine, containerd, and Docker Compose
-    sudo apt -y update
-    sudo apt -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+    # install the latest version of Docker Engine, containerd, and Docker Compose
+    sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
     # verify that Docker Engine is installed correctly by running the hello-world image
-    sudo service docker start
     sudo docker run hello-world
 
 #. Add your user to docker group
